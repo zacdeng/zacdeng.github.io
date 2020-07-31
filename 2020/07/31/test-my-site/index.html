@@ -213,7 +213,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      168 字
+      530 字
     </span>
   
 
@@ -223,7 +223,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      5
        分钟
     </span>
   
@@ -265,12 +265,46 @@
               <h1 id="racecar仿真竞赛经验总结（一）"><a href="#racecar仿真竞赛经验总结（一）" class="headerlink" title="racecar仿真竞赛经验总结（一）"></a>racecar仿真竞赛经验总结（一）</h1><p>由于疫情原因，今年的十五届恩智浦杯智能车竞赛室外光电组（ROS组别）初赛方式改为线上 rviz + gazebo 仿真的方式，由于是首次采用这个形式进行竞赛，博主遇到了一点问题也积累了一些经验，这个博客系列主要进行一些博主自己的经验分享以及心得总结~</p>
 <p>因为官方要求提交源码的缘故，这里也将博主自己的源码包开源啦~</p>
 <p>源码包地址放在这里，如果有帮助的话希望顺手给个star~😀   <a href="https://github.com/zacdeng/SmartCar-Competition" target="_blank" rel="noopener">github传送门</a></p>
+<hr>
+<h2 id="仿真概要"><a href="#仿真概要" class="headerlink" title="仿真概要"></a>仿真概要</h2><p>博主参考的代码是基于ros组官方提供的代码包进行优化，重写了控制器和路径追踪算法（参考pure_pursuit算法：<a href="https://github.com/Hypha-ROS/hypharos_minicar" target="_blank" rel="noopener">Ackermann based on MPC</a> 以及 <a href="https://github.com/Hypha-ROS/hypharos_racecar" target="_blank" rel="noopener">Ackermann only</a>），优化了navigation导航包，具体的算法以及该代码包的使用方法在github中已给出。</p>
+<h3 id="环境及功能包"><a href="#环境及功能包" class="headerlink" title="环境及功能包"></a>环境及功能包</h3><ul>
+<li>ubuntu16.04 ROS-Kinetic（ubuntu18.04 ROS-Melodic 也可以但有一些indigo版本的包无法使用，需要自行更换）</li>
+<li><a href="http://wiki.ros.org/rf2o_laser_odometry" target="_blank" rel="noopener">rf2o_laser_odometry</a>：订阅激光雷达/scan话题进行一级定位</li>
+<li><a href="http://wiki.ros.org/robot_pose_ekf" target="_blank" rel="noopener">robot_pose_ekf</a>：整合rf2o和imu进行更精确的定位</li>
+<li><a href="http://wiki.ros.org/amcl" target="_blank" rel="noopener">amcl</a>：修正定位误差，实现相对精准的定位</li>
+<li><a href="http://wiki.ros.org/navigation" target="_blank" rel="noopener">navigation</a>：实现小车自主导航和避障功能</li>
+<li>官方提供的小车模型和gazebo环境功能包</li>
+</ul>
+<h3 id="模型下载及环境部署"><a href="#模型下载及环境部署" class="headerlink" title="模型下载及环境部署"></a>模型下载及环境部署</h3><p><a href="https://pan.baidu.com/s/1TFBTbCeyQMuKnxemCbyNSw" target="_blank" rel="noopener">https://pan.baidu.com/s/1TFBTbCeyQMuKnxemCbyNSw</a> 提取码: crm5</p>
+<p>具体使用步骤参考北邮老哥的博客：<a href="https://www.guyuehome.com/9123" target="_blank" rel="noopener">智能车仿真 —— 2020室外光电创意组线上仿真赛</a></p>
+<ul>
+<li>这里需要注意一些依赖的安装要到位，防止踩坑（上文博客里都有~）</li>
+</ul>
+<hr>
+<h2 id="仿真效果"><a href="#仿真效果" class="headerlink" title="仿真效果"></a>仿真效果</h2><p>这里展示一些博主自己比赛的仿真效果，主要是一些rviz和gazebo的截图给大家看一下效果</p>
+<ul>
+<li><p>开始仿真——加载gazebo地图和rviz模型，初始化amcl等相关文件：</p>
+<p><img src="https://i.loli.net/2020/07/31/ZbFiDw5NCIAk2YE.jpg" srcset="/img/loading.gif" alt="ros1"></p>
+</li>
+<li><p>仿真进行——发布目标点后小车巡线进行导航及避障：</p>
+<p><img src="https://i.loli.net/2020/08/01/iLV9qyQwCAt7oPM.png" srcset="/img/loading.gif" alt="ros3"></p>
+</li>
+<li><p>仿真结束——小车完成：<img src="https://i.loli.net/2020/08/01/DP2aXkxo45QL3N8.png" srcset="/img/loading.gif" alt="ros2"></p>
+</li>
+</ul>
 
             </article>
             <hr>
             <div>
               <div class="post-metas mb-3">
                 
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/ROS/">ROS</a>
+                    
+                  </div>
                 
               </div>
               
