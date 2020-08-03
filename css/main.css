@@ -1,6 +1,6 @@
 html,
 body {
-  font-size: 16px;
+  font-size: 15px;
   font-family: "SF Pro SC", "SF Pro Text", "SF Pro Icons", PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
 }
 html,
@@ -597,8 +597,17 @@ sup > a::before,
 .navbar .dropdown-item:hover {
   color: #1abc9c;
 }
-.navbar .dropdown-collapse {
-  background-color: #2f4154;
+@supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
+  .navbar .dropdown-collapse {
+    background: rgba(191,196,201,0.5);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+}
+@supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
+  .navbar .dropdown-collapse {
+    background: #bfc4c9;
+  }
 }
 .navbar-custom {
   color: white;
@@ -606,11 +615,29 @@ sup > a::before,
 .navbar-custom a {
   color: white;
 }
-.top-nav-collapse {
-  background-color: #2f4154;
+@supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
+  .top-nav-collapse {
+    background: rgba(191,196,201,0.5);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
 }
-.navbar-col-show {
-  background-color: #2f4154;
+@supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
+  .top-nav-collapse {
+    background: #bfc4c9;
+  }
+}
+@supports (-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px)) {
+  .navbar-col-show {
+    background: rgba(191,196,201,0.5);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+}
+@supports not ((-webkit-backdrop-filter: blur(3px)) or (backdrop-filter: blur(3px))) {
+  .navbar-col-show {
+    background: #bfc4c9;
+  }
 }
 @media (max-width: 767px) {
   .navbar {
@@ -655,7 +682,7 @@ sup > a::before,
   overflow: visible;
 }
 .markdown-body pre code {
-  font-size: 85%;
+  font-size: 100%;
   display: block;
   overflow-x: auto;
   padding: 0.5rem 0;
