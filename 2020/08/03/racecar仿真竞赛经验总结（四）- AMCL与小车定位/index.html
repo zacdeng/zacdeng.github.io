@@ -491,7 +491,7 @@ self.imu_data.angular_velocity_covariance = [<span class="hljs-number">1e6</span
 </li>
 </ul>
 <h3 id="比赛中遇到的坑"><a href="#比赛中遇到的坑" class="headerlink" title="比赛中遇到的坑"></a>比赛中遇到的坑</h3><p>由于当时没有具体搞懂amcl的原理，配置完amcl的launch文件并搭建好tf树后以为已经把amcl用上了，当时的tf树变换如下：</p>
-<p><img src="https://i.loli.net/2020/08/03/nX5SCz6QaAl1ZvU.png" srcset="/img/loading.gif" alt=""></p>
+<p><img src="https://i.loli.net/2020/08/03/pOjK2nJFd4rmhMx.png" srcset="/img/loading.gif" alt="image-20200803195009706"></p>
 <p>结果最后发现实际使用的还是laser+imu整合出的odometry，效果飘得一批，如下图所示</p>
 <p><img src="https://i.loli.net/2020/08/03/P9ByWHrKDeGCRMa.png" srcset="/img/loading.gif" alt="image-20200803192118274"></p>
 <p>其中绿色点是小车读到的下一个目标点的位置，黑色点是小车获得的自身位置，可以发现两者在拐弯时偏差很大，当时以为是amcl协方差的问题尝试了半天，也修改了robot_pose_ekf和rf2o_laser_odometry里的与yaw相关的协方差矩阵，效果都不尽人意…后来请教学长才发现tf变换压根没发布，最后是主动监听odom的tf变换把amcl纠正偏差的效果用上在解决问题（具体代码在odom_tf_converter包里了）</p>
