@@ -213,7 +213,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.8k 字
+      3.9k 字
     </span>
   
 
@@ -223,7 +223,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      51
+      52
        分钟
     </span>
   
@@ -490,11 +490,15 @@ self.imu_data.angular_velocity_covariance = [<span class="hljs-number">1e6</span
 </ul>
 </li>
 </ul>
-<h3 id="比赛中遇到的坑"><a href="#比赛中遇到的坑" class="headerlink" title="比赛中遇到的坑"></a>比赛中遇到的坑</h3><p>由于当时没有具体搞懂amcl的原理，配置完amcl的launch文件并搭建好tf树后以为已经把amcl用上了，当时的tf树变换如下：</p>
+<h3 id="比赛中遇到的坑"><a href="#比赛中遇到的坑" class="headerlink" title="比赛中遇到的坑"></a>比赛中遇到的坑</h3><p>首先有朋友可能要问，amcl发布的主题不是有一个/amcl_pose了吗？为什么还要使用rf2o + ekf这样的方法来定位呢？</p>
+<p>确实理论上可以使用/amcl_pose发布的信息直接进行定位，但/amcl_pose发布的频率太低了…根本没办法让高速移动的小车实现精准的定位，关于其频率可以使用以下代码进行查看</p>
+<pre><code class="hljs jboss-cli">rostopic hz <span class="hljs-string">/amcl_pose</span></code></pre>
+
+<p>由于当时没有具体搞懂amcl的原理，配置完amcl的launch文件并搭建好tf树后以为已经把amcl用上了，当时的tf树变换如下：</p>
 <p><img src="https://i.loli.net/2020/08/03/pOjK2nJFd4rmhMx.png" srcset="/img/loading.gif" alt="image-20200803195009706"></p>
 <p>结果最后发现实际使用的还是laser+imu整合出的odometry，效果飘得一批，如下图所示</p>
 <p><img src="https://i.loli.net/2020/08/03/P9ByWHrKDeGCRMa.png" srcset="/img/loading.gif" alt="image-20200803192118274"></p>
-<p>其中绿色点是小车读到的下一个目标点的位置，黑色点是小车获得的自身位置，可以发现两者在拐弯时偏差很大，当时以为是amcl协方差的问题尝试了半天，也修改了robot_pose_ekf和rf2o_laser_odometry里的与yaw相关的协方差矩阵，效果都不尽人意…后来请教学长才发现tf变换压根没发布，最后是主动监听odom的tf变换把amcl纠正偏差的效果用上在解决问题（具体代码在odom_tf_converter包里了）</p>
+<p>其中绿色点是小车读到的下一个目标点的位置，黑色点是小车获得的自身位置，可以发现两者在拐弯时偏差很大，当时以为是amcl协方差的问题尝试了半天，也修改了robot_pose_ekf和rf2o_laser_odometry里的与yaw相关的协方差矩阵，效果都不尽人意…后来请教学长才发现tf变换压根没发布，最后是主动监听map-&gt;basefootprint的tf变换把amcl纠正偏差的效果用上在解决问题（具体代码在odom_tf_converter包里了）</p>
 <p>最后定位结果如下：</p>
 <p><img src="https://i.loli.net/2020/08/03/nX5SCz6QaAl1ZvU.png" srcset="/img/loading.gif" alt="image-20200803193322430"></p>
 
@@ -519,6 +523,12 @@ self.imu_data.angular_velocity_covariance = [<span class="hljs-number">1e6</span
                 <div class="post-prevnext row">
                   <div class="post-prev col-6">
                     
+                    
+                      <a href="/2020/08/04/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89-%20TF%E6%A0%91/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（五）- TF树</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </div>
                   <div class="post-next col-6">
