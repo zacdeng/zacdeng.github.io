@@ -293,7 +293,7 @@
 <p><img src="https://i.loli.net/2020/08/04/ZSqLkhYnMQwBK9V.png" srcset="/img/loading.gif" alt="image-20200804113141687"></p>
 <p>​    单拿激光雷达和小车模型之间的tf变换来说：假设在机器人运行过程中，激光雷达可以采集到距离前方障碍物的数据，这些数据当然是以激光雷达为原点的测量值，换句话说，也就是base_laser参考系下的测量值。现在，如果我们想使用这些数据帮助机器人完成避障功能，当然，由于激光雷达在机器人之上，直接使用这些数据不会产生太大的问题，但是激光雷达并不在机器人的中心之上，在极度要求较高的系统中，会始终存在一个雷达与机器人中心的偏差值。这个时候，如果我们采用一种坐标变换，将及激光数据从base_laser参考系变换到base_link参考下，问题不就解决了么。这里我们就需要定义这两个坐标系之间的变换关系。</p>
 <p>​    当然上述假设只列出了激光雷达和小车之间的坐标系差异，如果是一个复杂的系统呢？比如racecar小车中的四个车轮、电池模块以及车上搭载的摄像头和imu等外设都需要一个相应的坐标变换（如下图所示），那这个工程就比较繁琐了，ROS中的tf包就是为这类问题准备的。</p>
-<img src="https://i.loli.net/2020/08/04/Zi1lajcQJkLpvwG.png" srcset="/img/loading.gif" width="400" align="center">
+<img src="https://i.loli.net/2020/08/04/Zi1lajcQJkLpvwG.png" srcset="/img/loading.gif" width="400" div align=center />
 
 <h3 id="小车中涉及的tf变换简要分析"><a href="#小车中涉及的tf变换简要分析" class="headerlink" title="小车中涉及的tf变换简要分析"></a>小车中涉及的tf变换简要分析</h3><p>​    首先我们使用rqt_tf_tree查看整个racecar的tf树结构，结果如下：</p>
 <p><img src="https://i.loli.net/2020/08/04/RwIzZPLFjyvdgGW.png" srcset="/img/loading.gif" alt="image-20200803195009706"></p>
