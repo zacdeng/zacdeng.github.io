@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" type="image/png" href="/img/hacker.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#bfc4c9">
+  <meta name="description" content="Zac Personal Blog">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zac">
+  <title>racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法 - Zacdeng Blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong><img src="https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif" srcset="/img/loading.gif" width="50px"> Zacdeng's Space</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-bookmark-fill"></i>
+                Leisure
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/music/">
+                    <i class="iconfont icon-music"></i>
+                    Music
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/images/">
+                    <i class="iconfont icon-images"></i>
+                    Image
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/page3.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-08-06 13:00">
+      2020年8月6日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      18
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h1 id="racecar仿真竞赛经验总结（七）-Pure-pursuit纯追踪算法"><a href="#racecar仿真竞赛经验总结（七）-Pure-pursuit纯追踪算法" class="headerlink" title="racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法"></a>racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法</h1><p>前文链接：</p>
+<p><a href="https://zacdeng.github.io/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/" target="_blank" rel="noopener">racecar仿真竞赛经验总结（一） - 前言</a></p>
+<p><a href="https://zacdeng.github.io/2020/08/01/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89-%20racecar%E4%BB%BF%E7%9C%9F%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/" target="_blank" rel="noopener">racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</a></p>
+<p><a href="https://zacdeng.github.io/2020/08/02/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89-%20SLAM/" target="_blank" rel="noopener">racecar仿真竞赛经验总结（三）- 激光SLAM建图</a></p>
+<p><a href="https://zacdeng.github.io/2020/08/03/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%9B%9B%EF%BC%89-%20AMCL%E4%B8%8E%E5%B0%8F%E8%BD%A6%E5%AE%9A%E4%BD%8D/" target="_blank" rel="noopener">racecar仿真竞赛经验总结（四）- AMCL与小车定位</a></p>
+<p><a href="https://zacdeng.github.io/2020/08/04/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89-%20TF%E6%A0%91/" target="_blank" rel="noopener">racecar仿真竞赛经验总结（五）- TF树</a></p>
+<p><a href="https://zacdeng.github.io/2020/08/05/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89-%20Navigation%E5%AF%BC%E8%88%AA%E5%8C%85/" target="_blank" rel="noopener">racecar仿真竞赛经验总结（六）- Navigation导航包</a></p>
+<h2 id="博文推荐"><a href="#博文推荐" class="headerlink" title="博文推荐"></a>博文推荐</h2><h4 id="原理部分推荐博文："><a href="#原理部分推荐博文：" class="headerlink" title="原理部分推荐博文："></a>原理部分推荐博文：</h4><p>知乎：<a href="https://zhuanlan.zhihu.com/p/48117381" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/48117381</a></p>
+<p>CSDN：<a href="https://blog.csdn.net/gophae/article/details/100012763" target="_blank" rel="noopener">https://blog.csdn.net/gophae/article/details/100012763</a></p>
+<h4 id="Github源码参考链接："><a href="#Github源码参考链接：" class="headerlink" title="Github源码参考链接："></a>Github源码参考链接：</h4><p><a href="https://github.com/jmaye/pure-pursuit-controller-ros" target="_blank" rel="noopener">https://github.com/jmaye/pure-pursuit-controller-ros</a></p>
+<p><a href="https://github.com/Hypha-ROS/hypharos_racecar" target="_blank" rel="noopener">https://github.com/Hypha-ROS/hypharos_racecar</a></p>
+<p><a href="https://github.com/leggedrobotics/se2_navigation" target="_blank" rel="noopener">https://github.com/leggedrobotics/se2_navigation</a></p>
+<h2 id="原理简述"><a href="#原理简述" class="headerlink" title="原理简述"></a>原理简述</h2><p>车辆轨迹跟踪，目前的主流方法分为两类：基于几何追踪的方法和基于模型预测的方法。本文主要介绍基于几何追踪的pure-pursuit（纯跟踪）算法。</p>
+<h3 id="阿克曼转向几何"><a href="#阿克曼转向几何" class="headerlink" title="阿克曼转向几何"></a>阿克曼转向几何</h3><p>首先介绍一下车辆的转向模型–<strong>阿克曼转向几何</strong></p>
+<center>
+    <img src="https://i.loli.net/2020/08/06/PWR3ZML9wnVlgxG.png" srcset="/img/loading.gif" width="380">  <img src="https://i.loli.net/2020/08/06/5YDtXLxK1QHgjfw.png" srcset="/img/loading.gif" width="380">
+</center>
+
+<p>对转向时（假定小转向角）的正确几何关系，由于内外侧轮胎的转向半径不同，可以得出左右轮转向角为：</p>
+<center><img src="https://i.loli.net/2020/08/06/dvRgexEI3a4jpDQ.png" srcset="/img/loading.gif" width="180"></center>
+
+<center><img src="https://i.loli.net/2020/08/06/G5cNUyuDWRhr8Xt.png" srcset="/img/loading.gif" width="190"></center>
+
+<p>则前轮平均转角为：</p>
+<p><img src="https://i.loli.net/2020/08/06/Zp5qU1uKhWMPs8Y.png" srcset="/img/loading.gif" alt="image-20200806112031110"></p>
+<h3 id="自行车模型"><a href="#自行车模型" class="headerlink" title="自行车模型"></a>自行车模型</h3><p>接下来，我们再来看一个阿克曼几何的简化版–车辆单轨模型（即自行车模型）</p>
+<center><img src="https://i.loli.net/2020/08/06/rjPWD4bzLVBvq1I.png" srcset="/img/loading.gif" width="450"></center>
+
+<p>自行车模型实际上是对阿克曼转向几何的一个简化，我们知道，自行车模型将4轮车辆简化成2轮的模型，并且假定车龄只在平面上行驶，采用自行车模型的一大好处就在于它简化了前轮转向角与后轴将遵循的曲率之间的几何关系，其关系如下式所示：</p>
+<img src="https://i.loli.net/2020/08/06/QpkDz1lwc49fId7.png" srcset="/img/loading.gif" alt="image-20200806112242669" style="zoom:80%;" />
+
+<p>其中δ表示前轮的转角，L为轴距（Wheelbase），R则为在给定的转向角下后轴遵循着的圆的半径。这个公式能够在较低速度的场景下对车辆运动做估计。</p>
+<h3 id="Pure-pursuit纯追踪算法"><a href="#Pure-pursuit纯追踪算法" class="headerlink" title="Pure pursuit纯追踪算法"></a>Pure pursuit纯追踪算法</h3><p>从自行车模型出发，纯跟踪算法以车后轴为切点, 车辆纵向车身为切线, 通过控制前轮转角，使车辆可以沿着一条经过目标路点（goal point）的圆弧行驶，如下图所示：</p>
+<center><img src="https://i.loli.net/2020/08/06/rNYsO5lTcwnyM2a.png" srcset="/img/loading.gif" width="450"></center>
+
+<p>如上，pure pursuit 需要给出预瞄距离Ld，因此后期当工作效果不好的时候可以对这个预瞄距离进行tuning，但是过程繁琐，在某些情况下使用该模型效果不佳。给定预瞄距离后在预定轨迹上获得采样点(gx,gy)。本车的后轴中心，采样点(gx,gy)，以及车辆的运动学半径中心行程三角形，根据sin正弦函数三角公式，获得如下：</p>
+<center><img src="https://i.loli.net/2020/08/06/Bo4j8DSRef2niQP.png" srcset="/img/loading.gif" width="250"></center>
+
+<p>因为道路的曲率：</p>
+<center><img src="https://i.loli.net/2020/08/06/nc8NgKibxZ7RUhG.png" srcset="/img/loading.gif" width="80"></center>
+
+<p>上式也可以表示为：</p>
+<center><img src="https://i.loli.net/2020/08/06/doJZ8pMkFT2GyQU.png" srcset="/img/loading.gif" width="150"></center>
+
+<p>则由自行车模型中的式子 ，可得</p>
+<img src="https://i.loli.net/2020/08/06/3lGmBkieQdECPhf.png" srcset="/img/loading.gif" alt="image-20200806113935265" style="zoom:80%;" />
+
+<h2 id="改进部分"><a href="#改进部分" class="headerlink" title="改进部分"></a>改进部分</h2><h3 id="引入横向偏差"><a href="#引入横向偏差" class="headerlink" title="引入横向偏差"></a>引入横向偏差</h3><p>我们知道pure pursuit中的控制方法只对角度进行了控制，这种方法在实践中会出现一个弊端，纯在某种情况——小车的角度已经符合要求但并不在所规划的路线上，而是与其平行。我们的改进方法之一就是添加横向偏差，令其自动纠正这种平行的现象</p>
+<p>由于原理相同但实现方法很多，这里引用 <a href="https://blog.csdn.net/gophae/article/details/100012763" target="_blank" rel="noopener">博客链接</a> 中的描述——Stanley进行描述</p>
+<img src="https://i.loli.net/2020/08/06/YZcI13A7FxdRoTK.png" srcset="/img/loading.gif" alt="image-20200806114312699" style="zoom: 50%;" />
+
+<p>Stanley 考虑到了车辆后轴中心与预定轨迹的横向偏差e_fa，车辆头指向与预定轨迹heading angle 方向的夹角，stanley车辆期望转角的第一项为</p>
+<img src="https://i.loli.net/2020/08/06/bxtzpG1g4UKRE7c.png" srcset="/img/loading.gif" alt="image-20200806115151112" style="zoom:67%;" />
+
+<p>这里，theta为车辆的真实heading angle，theta_p为预定轨迹点的heading angle，差值就是车辆需要被纠正的heading angle。如果横向偏差不为零，车辆期望转角会产生第二个控制量，这个控制量和pure pursuit很相似，由前轴中心对应的车辆预定轨迹点C出，往切线防线延伸预瞄距离L，这里的预瞄距离仍然与车速成正比。于是，两项控制量可合并为：</p>
+<img src="https://i.loli.net/2020/08/06/nfY1DvW2H8GKpoL.png" srcset="/img/loading.gif" alt="image-20200806115227666" style="zoom: 62%;" />
+
+<p>体现在源码上如下：</p>
+<pre><code class="hljs prolog">angle_error = self.determine_steering_angle(self.<span class="hljs-symbol">Pose</span>, self.<span class="hljs-symbol">NextPoint</span>)
+angle = angle_raw + <span class="hljs-number">0.2215</span>*angle_error
+
+# ...
+
+def determine_steering_angle(self, pose, lookahead_point):
+        global steering_angle_last
+        rot = np.matrix([[np.cos(-pose[<span class="hljs-number">2</span>]), -np.sin(-pose[<span class="hljs-number">2</span>])], [np.sin(-pose[<span class="hljs-number">2</span>]), np.cos(-pose[<span class="hljs-number">2</span>])]]) # [ [a,b] , [c,d] ]
+        delta = np.matrix([[lookahead_point[<span class="hljs-number">0</span>] - pose[<span class="hljs-number">0</span>]],[lookahead_point[<span class="hljs-number">1</span>] - pose[<span class="hljs-number">1</span>]]])
+        local_delta = (rot*delta).transpose()
+        local_delta = np.array([local_delta[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>], local_delta[<span class="hljs-number">0</span>,<span class="hljs-number">1</span>]])
+        angle_error = self.model.steering_angle(local_delta)
+        return angle_error</code></pre>
+
+<h3 id="引入前馈控制"><a href="#引入前馈控制" class="headerlink" title="引入前馈控制"></a>引入前馈控制</h3><p>这一块内容是为了给小车一个预先量，防止小车高速过程中无法及时调整其角度和速度</p>
+<p>我们知道阿卡曼模型的小车无论是用TEB和DWA等局部路径规划还是使用纯追踪算法都是需要解算出小车的角度及速度，再发布给小车控制器达到控制小车的目的，而当小车速度达到一定程度时可能会出现控制器输出的角度、速度无法实现及时且精准的控制</p>
+<p>博主是用的纯追踪算法框架，其核心就是追踪路径规划算法规划出的全局/局部路径，而路径是以若干个点为元素的数组，我们的做法简单概括就是取包括小车下一目标点在内的多个点一同作为小车angle和velocity输出，在思想上类似于引入前馈控制</p>
+<p>体现在源码上就是</p>
+<pre><code class="hljs routeros"><span class="hljs-comment">#Calculate the angle to control</span>
+angle_to_go = []
+<span class="hljs-keyword">if</span> goal&gt;=(len(dist_array)-3):
+	Ls = dist_array[goal]
+	diff_angles = path_points_w[goal] - yaw # <span class="hljs-builtin-name">Find</span> the turning angle
+	rs = Ls/(2*math.sin(diff_angles)) # Calculate the turning radius
+	angle_raw = math.atan(0.335/rs) # <span class="hljs-builtin-name">Find</span> the wheel turning radius
+<span class="hljs-keyword">else</span>:
+	<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(0,3):
+		Ls = dist_array[goal+i]
+		diff_angles = path_points_w[goal+i] - yaw # <span class="hljs-builtin-name">Find</span> the turning angle
+		rs = Ls/(2*math.sin(diff_angles)) # Calculate the turning radius
+		angles = math.atan(0.335/rs) # <span class="hljs-builtin-name">Find</span> the wheel turning radius
+		angle_to_go.append(angles)
+	angle_raw = 0.5<span class="hljs-number">*a</span>ngle_to_go[0] + 0.3<span class="hljs-number">*a</span>ngle_to_go[1] + 0.2<span class="hljs-number">*a</span>ngle_to_go[2]
+
+<span class="hljs-comment"># ...</span>
+
+<span class="hljs-comment">#Calculate the velocity to control</span>
+diff_control_angle_array = []
+<span class="hljs-comment"># ponits after goal</span>
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> range(0,3):
+	veclocity_control = self.dist((path_points_x[goal+i], path_points_y[goal+i]), (x,y))
+	control_L = dist_array[goal+i]
+	diff_control_angle = path_points_w[goal+i] - yaw # <span class="hljs-builtin-name">Find</span> the turning angle
+	control_r = control_L/(2*math.sin(diff_control_angle)) # Calculate the turning radius
+	control_angle = math.atan(0.335/control_r) # <span class="hljs-builtin-name">Find</span> the wheel turning radius
+	diff_control_angle_array.append(control_angle)
+angle_control = np.mean(diff_control_angle_array)</code></pre>
+
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/">racecar智能车仿真</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/ROS/">ROS</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/08/05/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89-%20Navigation%E5%AF%BC%E8%88%AA%E5%8C%85/">
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（六）- Navigation导航包</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      
+
+
+      <word style=font-size:13px>
+        Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+        | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+        | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+      </word>
+
+      <br>
+
+      <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+      <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+      <br>
+
+      <span id="timeDate" style=font-size:13px>载入天数...</span>
+      <span id="times" style=font-size:13px>载入时分秒...</span>
+      <script>
+      var now = new Date();
+      function createtime(){
+          var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+          now.setTime(now.getTime()+250);
+          days = (now - grt ) / 1000 / 60 / 60 / 24;
+          dnum = Math.floor(days);
+          hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+          hnum = Math.floor(hours);
+          if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+          }
+          minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+          mnum = Math.floor(minutes);
+          if(String(mnum).length ==1 ){
+                    mnum = "0" + mnum;
+          }
+          seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+          snum = Math.round(seconds);
+          if(String(snum).length ==1 ){
+                    snum = "0" + snum;
+          }
+          document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+          document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+      }
+      setInterval("createtime()",250);
+      </script>
+    </div>
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 60,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+</body>
+</html>
