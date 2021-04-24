@@ -29,6 +29,33 @@
   
   
   <entry>
+    <title>Reinforcement Learning</title>
+    <link href="/2021/04/24/Reinforcement%20Learning-Introduction/"/>
+    <url>/2021/04/24/Reinforcement%20Learning-Introduction/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Reinforcement-Learning-Introduction"><a href="#Reinforcement-Learning-Introduction" class="headerlink" title="Reinforcement Learning - Introduction"></a>Reinforcement Learning - Introduction</h1><p>毕设做的强化学习内容，准备有时间了整理一下整个流程，先占个坑</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Reinforcement Learning</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>强化学习</tag>
+      
+      <tag>Reinforcement Learning</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法</title>
     <link href="/2020/08/06/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%83%EF%BC%89-%20Pure%20pursuit%E7%BA%AF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95/"/>
     <url>/2020/08/06/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%83%EF%BC%89-%20Pure%20pursuit%E7%BA%AF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95/</url>
