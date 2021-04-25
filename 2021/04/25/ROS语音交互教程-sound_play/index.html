@@ -17,7 +17,7 @@
   <meta name="description" content="Zac Personal Blog">
   <meta name="author" content="Zachary Deng">
   <meta name="keywords" content="Zac">
-  <title>git首次配置远程仓库 - Zacdeng Blog</title>
+  <title>ROS语音交互 —— sound_play - Zacdeng Blog</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -202,8 +202,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2021-04-24 14:00">
-      2021年4月24日 下午
+    <time datetime="2021-04-25 14:00">
+      2021年4月25日 下午
     </time>
   </div>
 
@@ -213,7 +213,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      385 字
+      753 字
     </span>
   
 
@@ -223,7 +223,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      4
+      9
        分钟
     </span>
   
@@ -262,34 +262,76 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h1 id="git首次配置远程仓库"><a href="#git首次配置远程仓库" class="headerlink" title="git首次配置远程仓库"></a>git首次配置远程仓库</h1><p>这篇内容面向首次使用git的初学者，将解释如何正常的使用github仓库</p>
-<h2 id="配置全局用户名和邮箱"><a href="#配置全局用户名和邮箱" class="headerlink" title="配置全局用户名和邮箱"></a>配置全局用户名和邮箱</h2><p>其中user.name为你的github账户名，email为你的github邮箱</p>
-<pre><code class="hljs shell">git config --global user.name "zacdeng"
-git config --global user.email "xxx@gmail.com"</code></pre>
+              <h1 id="ROS语音交互-sound-play"><a href="#ROS语音交互-sound-play" class="headerlink" title="ROS语音交互 - sound_play"></a>ROS语音交互 - sound_play</h1><h2 id="Introduction-of-sound-play-package"><a href="#Introduction-of-sound-play-package" class="headerlink" title="Introduction of sound_play package"></a>Introduction of sound_play package</h2><p><code>audio_common</code>是一个第三方音频开发包，它实现了音频驱动以及相关的 ROS 消息机制。它包含如下几个库：<br>1）audio_capture: 从麦克风采集声音<br>2）audio_play: 从 audio_capture 收集声音并通过声卡播放<br>3）audio_common_msgs: 声音传输的消息定义<br>4）sound_play: 播放声音和语音合成</p>
+<p>我们这里主要使用的是最后这个<code>sound_play</code>，它的主要的功能包括：<br>1）声卡驱动；<br>2）播放声音（wav、ogg）；<br>3）语音合成（仅限英文）<br>同时它支持 C++ 以及 python 接口，使得开发者可以不用关心底层的驱动和算法。</p>
+<p><code>sound_play</code>提供一个node，可以把topic中的commands转化为语音， 该node支持内建语音，播放OGG/WAV文件，以及通过festival做语音合成功能。</p>
+<p>参考链接：</p>
+<ul>
+<li><p><a href="http://wiki.ros.org/sound_play" target="_blank" rel="noopener">sound_play - ROS wiki</a></p>
+</li>
+<li><p><a href="https://blog.csdn.net/x_r_su/article/details/53025375" target="_blank" rel="noopener">ROS语音合成 - sound_play应用</a></p>
+</li>
+<li><p><a href="http://www.liuxiao.org/2015/11/ros-%E5%AE%89%E8%A3%85-sound_play-%E9%A9%B1%E5%8A%A8%E5%8F%8A%E6%92%AD%E6%94%BE%E3%80%81%E5%90%88%E6%88%90%E5%A3%B0%E9%9F%B3/" target="_blank" rel="noopener">ros安装sound_play及播放合成声音</a></p>
+</li>
+<li><p><a href="https://github.com/ros-drivers/audio_common" target="_blank" rel="noopener">source - github</a></p>
+</li>
+</ul>
+<hr>
+<h2 id="Install-sound-play"><a href="#Install-sound-play" class="headerlink" title="Install sound_play"></a>Install sound_play</h2><h3 id="下载-sound-play-功能包并编译"><a href="#下载-sound-play-功能包并编译" class="headerlink" title="下载 sound_play 功能包并编译"></a>下载 sound_play 功能包并编译</h3><p>1）新建一个<code>~/ros_workspace/src/</code>目录后从github直接clone</p>
+<pre><code class="hljs shell">git clone https://github.com/ros-drivers/audio_common.git</code></pre>
 
-<h2 id="配置密钥"><a href="#配置密钥" class="headerlink" title="配置密钥"></a>配置密钥</h2><pre><code class="hljs shell">ssh-keygen -t rsa -C "zacdeng0720@gmail.com"
-cat ~/.ssh/id_rsa.pub</code></pre>
+<p>2）返回<code>~/ros_workspace/</code>目录下使用rosdep安装依赖</p>
+<pre><code class="hljs shell">rosdep install sound_play</code></pre>
 
-<p><img src="https://i.loli.net/2021/04/24/zvdrM3A2iSZP4L7.png" srcset="/img/loading.gif" alt="image-20210424141420517"></p>
-<p>随后将得到的密钥配置到远程仓库的SSH Keys中</p>
-<p><img src="https://i.loli.net/2021/04/24/TPV8Rvgih6kOdFM.png" srcset="/img/loading.gif" alt="image-20210424141521813"></p>
-<p><img src="https://i.loli.net/2021/04/24/bukc7BAsq1nUevp.png" srcset="/img/loading.gif" alt=""></p>
-<p>其中Title最好设置为你的设备名，做好相应标识方便以后修改时认得出</p>
-<h2 id="建立仓库"><a href="#建立仓库" class="headerlink" title="建立仓库"></a>建立仓库</h2><h3 id="初始化仓库"><a href="#初始化仓库" class="headerlink" title="初始化仓库"></a>初始化仓库</h3><pre><code class="hljs shell">git init</code></pre>
+<p>如果所有依赖库都已安装会显示，没有的话会自行安装：</p>
+<blockquote>
+<p>#All required rosdeps installed successfully</p>
+</blockquote>
+<p>3）最后在同一目录下编译即可：</p>
+<pre><code class="hljs shell">catkin_make</code></pre>
 
-<h3 id="放入暂存区"><a href="#放入暂存区" class="headerlink" title="放入暂存区"></a>放入暂存区</h3><pre><code class="hljs shell">git add . (表示暂存所有文件)
-git add 某个文件名称</code></pre>
+<h3 id="Usages"><a href="#Usages" class="headerlink" title="Usages"></a>Usages</h3><h4 id="Test-for-sound-play"><a href="#Test-for-sound-play" class="headerlink" title="Test for sound_play"></a>Test for sound_play</h4><p>1）运行roscore：</p>
+<pre><code class="hljs shell">roscore</code></pre>
 
-<p>如果出现：<code>warning: LF will be replaced by CRLF in &#39;xxx&#39;</code>错误时，原因是因为Windows和Linux提交时的换行符不一样，解决方法：</p>
-<pre><code class="hljs shell">git config --global core.autocwenrlf false</code></pre>
+<p>2）新开一个terminal窗口并cd到之前创建的<code>~/ros_workspace/</code>目录下source：</p>
+<pre><code class="hljs shell">source devel/setup.bash</code></pre>
 
-<h3 id="提交文件"><a href="#提交文件" class="headerlink" title="提交文件"></a>提交文件</h3><p>git commit 主要是将暂存区里的改动给提交到本地的版本库。每次使用git commit 命令我们都会在本地版本库生成一个40位的哈希值，这个哈希值也叫commit-id，commit-id在版本回退的时候是非常有用的，它相当于一个快照,可以在未来的任何时候通过与git reset的组合命令回到这里.</p>
-<pre><code class="hljs shell">git commit -m '输入备注内容'</code></pre>
+<p>3）启动节点：</p>
+<pre><code class="hljs shell">rosrun sound_play soundplay_node.py</code></pre>
 
-<pre><code class="hljs shell">git push (-u) origin master</code></pre>
+<p>如果显示类似以下信息则表示节点打开成功：</p>
+<blockquote>
+<p>[INFO] [WallTime: 1448443557.340794] sound_play node is ready to play sound</p>
+</blockquote>
+<h4 id="Play-sound"><a href="#Play-sound" class="headerlink" title="Play sound"></a>Play sound</h4><p>1）测试播放内置声音：</p>
+<p>我们使用系统内置的声音进行播放，运行如下命令：</p>
+<pre><code class="hljs shell">rosrun sound_play playbuiltin.py 2</code></pre>
 
-<p>第一次配置时会要求输入github账户名和密码，正常输入即可</p>
-<h3 id="git配置记住用户名和密码"><a href="#git配置记住用户名和密码" class="headerlink" title="git配置记住用户名和密码"></a>git配置记住用户名和密码</h3><pre><code class="hljs shell">git config --global credential.helper store</code></pre>
+<p>如果听到两声锣声则表示运行成功。</p>
+<p>2）测试播放 WAV 或 MP3 等声音：</p>
+<p>使用 play.py 这个例子即可，后面的是我的 wav 文件路径，使用时修改成自己的：</p>
+<pre><code class="hljs shell">rosrun sound_play play.py /home/zacdeng/Music/a2002011001-e02-ulaw.wav</code></pre>
+
+<p>*<em>注意：文件路径必须是绝对路径，不要使用<code>~/</code> *</em></p>
+<p>或者播放 MP3 文件：</p>
+<pre><code class="hljs shell">rosrun sound_play play.py /home/zacdeng/Music/a2002011001-e02-128k.mp3</code></pre>
+
+<p>正常情况下它会显示：</p>
+<blockquote>
+<p>Playing “/home/zacdeng/Music/a2002011001-e02-128k.mp3”.</p>
+</blockquote>
+<p>3）测试语音合成：</p>
+<p>这是比较吸引人的一个功能，它使用了 <code>text2wave</code> 库将一段文本转成语音再进行播放。调用的例子如下：</p>
+<pre><code class="hljs shell">rosrun sound_play say.py 'Hello world'</code></pre>
+
+<p>正常情况下它会显示：</p>
+<blockquote>
+<p>Saying: Hello World<br>Voice: voice_kal_diphone<br>Volume: 1.0</p>
+</blockquote>
+<p><strong>注意：输入文本必须是英文，暂时不能播放中文</strong></p>
+<p>如果你听到一段蹩脚的英文朗读 Hello World 那么这个例子你也运行成功了。由于音频库大小问题，这个合成效果可能不太自然，有兴趣的同学可以根据 <a href="http://ubuntuforums.org/showthread.php?t=751169" target="_blank" rel="noopener">参考</a> 研究下 <code>text2wave</code> 库怎么替换下别的声音。</p>
+<p>大概整个使用流程就是这么多了，如果有遇到其他问题可以参考上面提到的博客！Good Luck！</p>
+
             </article>
             <hr>
             <div>
@@ -298,7 +340,7 @@ git add 某个文件名称</code></pre>
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/Git/">Git</a>
+                      <a class="hover-with-bg" href="/categories/ROS/">ROS</a>
                     
                   </div>
                 
@@ -306,7 +348,9 @@ git add 某个文件名称</code></pre>
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/Git/">Git</a>
+                      <a class="hover-with-bg" href="/tags/ROS/">ROS</a>
+                    
+                      <a class="hover-with-bg" href="/tags/sound-play/">sound_play</a>
                     
                   </div>
                 
@@ -319,18 +363,12 @@ git add 某个文件名称</code></pre>
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2021/04/25/ROS%E8%AF%AD%E9%9F%B3%E4%BA%A4%E4%BA%92%E6%95%99%E7%A8%8B-sound_play/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">ROS语音交互 —— sound_play</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2021/04/24/Reinforcement%20Learning-Introduction/">
-                        <span class="hidden-mobile">Reinforcement Learning</span>
+                      <a href="/2021/04/24/git%E9%A6%96%E6%AC%A1%E9%85%8D%E7%BD%AE%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/">
+                        <span class="hidden-mobile">git首次配置远程仓库</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -515,7 +553,7 @@ git add 某个文件名称</code></pre>
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "git首次配置远程仓库&nbsp;",
+        "ROS语音交互 —— sound_play&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 60,
