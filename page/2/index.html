@@ -1,0 +1,1034 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="Zack&#39;s Personal Blog">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Zachary&#39;s Blog">
+<meta property="og:url" content="http://example.com/page/2/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="Zack&#39;s Personal Blog">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page1.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Talk is cheap. Show me the code."></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          style="margin-top: 0">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/07/11/MySQL%20-%20%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E6%80%BB%E7%BB%93/" target="_self">
+          MySQL - 常用函数总结
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/07/11/MySQL%20-%20%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E6%80%BB%E7%BB%93/" target="_self">
+        <div>
+          
+          MySQL - 常用函数总结MySQL 字符串函数   函数 描述 实例    ASCII(s) 返回字符串 s 的第一个字符的 ASCII 码。 返回 CustomerName 字段第一个字母的 ASCII 码：SELECT ASCII(CustomerName) AS NumCodeOfFirstChar FROM Customers;   CHAR_LENGTH(s) 返回字符串 s 的字符
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-07-11 15:00" pubdate>
+              2021-07-11
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/MySQL/">#MySQL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/07/10/MySQL%20-%20%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93/" target="_self">
+          MySQL - 基础用法总结
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/07/10/MySQL%20-%20%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93/" target="_self">
+        <div>
+          
+          MySQL - 基础用法总结申明：本文章内容均为作者学习完菜鸟教程的MySQL系列教程后的总结，任何内容请以菜鸟教程文章内容为准！ MySQL管理Windows系统 启动MySQL服务器  cd c:&#x2F;mysql&#x2F;bin mysqld --console   关闭MySQL服务器  cd c:&#x2F;mysql&#x2F;bin mysqladmin -uroot shutdown  或者直接打开任务管理器-服务
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-07-10 13:00" pubdate>
+              2021-07-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/MySQL/">#MySQL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/05/30/%E5%88%9D%E8%AF%95%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%20-%20Gym%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%80%92%E7%AB%8B%E6%91%86%E5%AE%9E%E9%AA%8C/" target="_self">
+          初试强化学习 - Gym框架搭建倒立摆实验
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/05/30/%E5%88%9D%E8%AF%95%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%20-%20Gym%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%80%92%E7%AB%8B%E6%91%86%E5%AE%9E%E9%AA%8C/" target="_self">
+        <div>
+          
+          初试强化学习 - Gym框架搭建倒立摆实验 摘要： ​    OpenAI Gym是一款用于研发和比较强化学习算法的工具包，本文主要介绍Gym仿真环境的搭建、功能和工具包的使用方法，并详细介绍其中的经典控制问题中的倒立摆（CartPole）问题。最后针对强化学习方法解决倒立摆问题给出自己的理解，并给出了相应的完整python代码示例和解释。 一些资源：  OpenAI Gym官方docs：Docu
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-05-30 10:45" pubdate>
+              2021-05-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Reinforcement-Learning/" class="category-chain-item">Reinforcement Learning</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Reinforcement-Learning/">#Reinforcement Learning</a>
+            
+              <a href="/tags/Gym/">#Gym</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/28/Typora%E4%BD%BF%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/" target="_self">
+          Typora使用说明
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/04/28/Typora%E4%BD%BF%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/" target="_self">
+        <div>
+          
+          Typora使用说明  Typora官网链接：Typora  使用说明：Typora完全使用详解   Typora 是一款支持实时预览的 Markdown 文本编辑器。它有 OS X、Windows、Linux 三个平台的版本，且是完全免费的 Typora快捷键使用（一）菜单栏 文件：alt+F  编辑：alt+E  段落：alt+P  格式：alt+O  视图：alt+V  主题：alt+T
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-28 15:00" pubdate>
+              2021-04-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Markdown/" class="category-chain-item">Markdown</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Typora/">#Typora</a>
+            
+              <a href="/tags/Markdown/">#Markdown</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%B8%80%EF%BC%89/" target="_self">
+          ROS中的OpenCV摄像头标定（一）
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%B8%80%EF%BC%89/" target="_self">
+        <div>
+          
+          ROS中的OpenCV摄像头标定（一）摄像头是一种非常精密的光学仪器，它对外界环境的感知是非常敏感的。由于摄像头内部和外部的一些原因，生成的物体图像常常会发生一定的畸变，例如在鱼眼摄像头，畸变是非常大的，如果直接将采集到的图像拿来进行图像处理的话，会产生很大的问题，为了避免数据源造成的误差，需要针对摄像头的参数进行标定。 对于OpenCV摄像头标定的内容提供两个不同的方法，分别是利用OpenCV例
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-27 14:00" pubdate>
+              2021-04-27
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/OpenCV/" class="category-chain-item">OpenCV</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ROS/">#ROS</a>
+            
+              <a href="/tags/OpenCV/">#OpenCV</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%BA%8C%EF%BC%89/" target="_self">
+          ROS中的OpenCV摄像头标定（二）
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%BA%8C%EF%BC%89/" target="_self">
+        <div>
+          
+          ROS中的OpenCV摄像头标定（二）上一篇博客介绍了ROS中利用OpenCV例程进行摄像头标定的方法：ROS中的OpenCV摄像头标定（一）, 这篇博客将介绍如何使用 Camera Calibration 功能包进行摄像头标定 ros wiki上的参考教程： 单目摄像机标定例程 双目摄像机标定例程 （一）图像读取使用usb_cam读取图像，launch文件如下： &lt;launch&gt;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-27 14:00" pubdate>
+              2021-04-27
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/OpenCV/" class="category-chain-item">OpenCV</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ROS/">#ROS</a>
+            
+              <a href="/tags/OpenCV/">#OpenCV</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/25/ROS%E8%AF%AD%E9%9F%B3%E4%BA%A4%E4%BA%92%E6%95%99%E7%A8%8B-sound_play/" target="_self">
+          ROS语音交互 —— sound_play
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/04/25/ROS%E8%AF%AD%E9%9F%B3%E4%BA%A4%E4%BA%92%E6%95%99%E7%A8%8B-sound_play/" target="_self">
+        <div>
+          
+          ROS语音交互 - sound_playIntroduction of sound_play packageaudio_common是一个第三方音频开发包，它实现了音频驱动以及相关的 ROS 消息机制。它包含如下几个库：1）audio_capture: 从麦克风采集声音2）audio_play: 从 audio_capture 收集声音并通过声卡播放3）audio_common_msgs: 声音传
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-25 14:00" pubdate>
+              2021-04-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/ROS/" class="category-chain-item">ROS</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ROS/">#ROS</a>
+            
+              <a href="/tags/sound-play/">#sound_play</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/24/Reinforcement%20Learning-Introduction/" target="_self">
+          Reinforcement Learning
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/04/24/Reinforcement%20Learning-Introduction/" target="_self">
+        <div>
+          
+          Reinforcement Learning - Introduction毕设做的强化学习内容，准备有时间了整理一下整个流程，先占个坑
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-24 14:00" pubdate>
+              2021-04-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Reinforcement-Learning/" class="category-chain-item">Reinforcement Learning</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">#强化学习</a>
+            
+              <a href="/tags/Reinforcement-Learning/">#Reinforcement Learning</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/24/git%E9%A6%96%E6%AC%A1%E9%85%8D%E7%BD%AE%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/" target="_self">
+          git首次配置远程仓库
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2021/04/24/git%E9%A6%96%E6%AC%A1%E9%85%8D%E7%BD%AE%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/" target="_self">
+        <div>
+          
+          git首次配置远程仓库这篇内容面向首次使用git的初学者，将解释如何正常的使用github仓库 配置全局用户名和邮箱其中user.name为你的github账户名，email为你的github邮箱 git config --global user.name &quot;zacdeng&quot; git config --global user.email &quot;xxx@gmail.com&amp;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-24 14:00" pubdate>
+              2021-04-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Git/" class="category-chain-item">Git</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Git/">#Git</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2020/08/06/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%83%EF%BC%89-%20Pure%20pursuit%E7%BA%AF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95/" target="_self">
+          racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法
+        </a>
+      </h1>
+
+      <a class="index-excerpt" href="/2020/08/06/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%83%EF%BC%89-%20Pure%20pursuit%E7%BA%AF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95/" target="_self">
+        <div>
+          
+          racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 racecar仿真竞赛经验总结（四）- AMCL与小车定位 racecar仿真竞赛经验总结（五）- TF树 racecar仿真竞赛经验总结（
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-08-06 13:00" pubdate>
+              2020-08-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/" class="category-chain-item">racecar智能车仿真</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ROS/">#ROS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

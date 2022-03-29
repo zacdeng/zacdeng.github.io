@@ -1,0 +1,1838 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="racecar仿真竞赛经验总结（六）- Navigation导航包前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 racecar仿真竞赛经验总结（四）- AMCL与小车定位 racecar仿真竞赛经验总结（五）- TF树 接下来的部分应该算是整个智能车仿真比赛最">
+<meta property="og:type" content="article">
+<meta property="og:title" content="racecar仿真竞赛经验总结（六）- Navigation导航包">
+<meta property="og:url" content="http://example.com/2020/08/05/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89-%20Navigation%E5%AF%BC%E8%88%AA%E5%8C%85/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="racecar仿真竞赛经验总结（六）- Navigation导航包前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 racecar仿真竞赛经验总结（四）- AMCL与小车定位 racecar仿真竞赛经验总结（五）- TF树 接下来的部分应该算是整个智能车仿真比赛最">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/Q6ufzjZVtwkYIT7.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/rIRimT4w2f1GlL9.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/x6IunsDvTafHgSB.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/Qnshgy3KLdFDwbf.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/4mMGoP39chwXgHL.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/IDz9kOlrPN3dBa2.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/RhF6Xj3D8wt7YA5.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/06/mfLrbjOSxXJcYtG.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/06/qYlsKCnxNuhA3oe.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/qBbACo9VGEXkzhT.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/1ONC4buEZQMFjrm.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/05/C2nbsNX19oGAqQe.png">
+<meta property="article:published_time" content="2020-08-05T22:00:07.000Z">
+<meta property="article:modified_time" content="2020-08-06T05:27:54.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="ROS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/08/04/Q6ufzjZVtwkYIT7.png">
+  
+  
+  <title>racecar仿真竞赛经验总结（六）- Navigation导航包 - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="racecar仿真竞赛经验总结（六）- Navigation导航包"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-08-05 17:00" pubdate>
+          August 5, 2020 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          27k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          223 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">racecar仿真竞赛经验总结（六）- Navigation导航包</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="racecar仿真竞赛经验总结（六）-Navigation导航包"><a href="#racecar仿真竞赛经验总结（六）-Navigation导航包" class="headerlink" title="racecar仿真竞赛经验总结（六）- Navigation导航包"></a>racecar仿真竞赛经验总结（六）- Navigation导航包</h1><p>前文链接：</p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/">racecar仿真竞赛经验总结（一） - 前言</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/01/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89-%20racecar%E4%BB%BF%E7%9C%9F%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/">racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/02/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89-%20SLAM/">racecar仿真竞赛经验总结（三）- 激光SLAM建图</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/03/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%9B%9B%EF%BC%89-%20AMCL%E4%B8%8E%E5%B0%8F%E8%BD%A6%E5%AE%9A%E4%BD%8D/">racecar仿真竞赛经验总结（四）- AMCL与小车定位</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/04/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89-%20TF%E6%A0%91/">racecar仿真竞赛经验总结（五）- TF树</a></p>
+<p>接下来的部分应该算是整个智能车仿真比赛最为核心的部分——move_base（路径规划包）</p>
+<h2 id="move-base-package"><a href="#move-base-package" class="headerlink" title="move_base package"></a>move_base package</h2><h3 id="博文链接"><a href="#博文链接" class="headerlink" title="博文链接"></a>博文链接</h3><p>创客智造Navigation系列教程：<a target="_blank" rel="noopener" href="https://www.ncnynl.com/archives/201708/1880.html">https://www.ncnynl.com/archives/201708/1880.html</a></p>
+<p><em>创客智造里面的博文挺老的了可能会有错误，但总体还是挺好的，有比较全的Navigation教程</em></p>
+<p>ROS Navigation github源码包：<a target="_blank" rel="noopener" href="https://github.com/ros-planning/navigation">https://github.com/ros-planning/navigation</a></p>
+<p>move_base：</p>
+<ul>
+<li>ROS Wiki：<a target="_blank" rel="noopener" href="http://wiki.ros.org/move_base">http://wiki.ros.org/move_base</a></li>
+<li>古月居：<a target="_blank" rel="noopener" href="https://www.guyuehome.com/270">https://www.guyuehome.com/270</a></li>
+<li>CSDN：<a target="_blank" rel="noopener" href="https://blog.csdn.net/heyijia0327/article/details/41823809">https://blog.csdn.net/heyijia0327/article/details/41823809</a></li>
+</ul>
+<p>TEB local planner：</p>
+<ul>
+<li>ROS Wiki：<a target="_blank" rel="noopener" href="http://wiki.ros.org/teb_local_planner">http://wiki.ros.org/teb_local_planner</a></li>
+<li>TEB参数调整 <em>1</em>：<a target="_blank" rel="noopener" href="https://blog.csdn.net/Fourier_Legend/article/details/89398485">https://blog.csdn.net/Fourier_Legend/article/details/89398485</a></li>
+<li>TEB参数调整 <em>2</em>：<a target="_blank" rel="noopener" href="https://www.knightdusk.cn/2019/06/features-and-tuning-guide-for-teb-local-planner/">https://www.knightdusk.cn/2019/06/features-and-tuning-guide-for-teb-local-planner/</a></li>
+</ul>
+<p>DWA local planner:</p>
+<ul>
+<li><p>ROS Wiki：<a target="_blank" rel="noopener" href="http://wiki.ros.org/dwa_local_planner">http://wiki.ros.org/dwa_local_planner</a></p>
+</li>
+<li><p>DWA参数调整：<a target="_blank" rel="noopener" href="https://www.ncnynl.com/archives/201708/1906.html">https://www.ncnynl.com/archives/201708/1906.html</a></p>
+<p><em>DWA相较于TEB而言参数比较少，含义也很清晰，网上的资源会比较少一些</em></p>
+</li>
+</ul>
+<p>其他局部路径规划算法：</p>
+<ul>
+<li>古月居：<a target="_blank" rel="noopener" href="https://www.guyuehome.com/5500">https://www.guyuehome.com/5500</a></li>
+</ul>
+<h3 id="简单阐述"><a href="#简单阐述" class="headerlink" title="简单阐述"></a>简单阐述</h3><p><img src="https://i.loli.net/2020/08/04/Q6ufzjZVtwkYIT7.png" srcset="/img/loading.gif" lazyload alt="image-20200804225115898"></p>
+<p>在总体框架图中可以看到，move_base提供了ROS导航的配置、运行、交互接口，它主要包括四个部分：</p>
+<p>（1）全局路径规划（global planner）：根据给定的目标位置进行总体路径的规划；</p>
+<p>（2）本地实时规划（local planner）：根据附近的障碍物进行躲避路线规划。</p>
+<p>（3）全局代价地图（global costmap）：用于在全局地图中将laser扫面数据或者点云数据转化成一个2d的网格地图</p>
+<p>（4）局部代价地图（local costmap）：用于在局部地图中将laser扫面数据或者点云数据转化成一个2d的网格地图</p>
+<p>上图中位于导航功能正中心的蓝色方框是<code>move_base</code>节点，可以理解为一个强大的路径规划器，在实际的导航任务中，你只需要启动这一个node，并且给它提供数据，就可以规划出路径和速度。 <code>move_base</code>之所以能做到路径规划，是因为它包含了很多的插件，像图中的圆圈<code>global_planner</code>、<code>local_planner</code>、<code>global_costmap</code>、<code>local_costmap</code>、<code>recovery_behaviors</code>。这些插件用于负责一些更细微的任务：全局路径规划、局部路径规划、全局代价地图、局部代价地图、恢复行为。而每一个插件其实也都是一个package，放在Navigation Stack里。</p>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p>以下配置文件仅针对博主提供的racecar源码包</p>
+<h4 id="move-base启动文件"><a href="#move-base启动文件" class="headerlink" title="move_base启动文件"></a>move_base启动文件</h4><ul>
+<li><p>racecar_runway_navigation.launch 启动move_base节点的launch文件</p>
+<div class="code-wrapper"><pre><code class="hljs xml"><span class="hljs-comment">&lt;!--Launch the move base with time elastic band--&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;/use_sim_time&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">node</span> <span class="hljs-attr">pkg</span>=<span class="hljs-string">&quot;move_base&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;move_base&quot;</span> <span class="hljs-attr">respawn</span>=<span class="hljs-string">&quot;false&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;move_base&quot;</span> <span class="hljs-attr">output</span>=<span class="hljs-string">&quot;screen&quot;</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">rosparam</span> <span class="hljs-attr">file</span>=<span class="hljs-string">&quot;$(find racecar_gazebo)/config/costmap_common_params.yaml&quot;</span> <span class="hljs-attr">command</span>=<span class="hljs-string">&quot;load&quot;</span> <span class="hljs-attr">ns</span>=<span class="hljs-string">&quot;global_costmap&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">rosparam</span> <span class="hljs-attr">file</span>=<span class="hljs-string">&quot;$(find racecar_gazebo)/config/costmap_common_params.yaml&quot;</span> <span class="hljs-attr">command</span>=<span class="hljs-string">&quot;load&quot;</span> <span class="hljs-attr">ns</span>=<span class="hljs-string">&quot;local_costmap&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">rosparam</span> <span class="hljs-attr">file</span>=<span class="hljs-string">&quot;$(find racecar_gazebo)/config/local_costmap_params.yaml&quot;</span> <span class="hljs-attr">command</span>=<span class="hljs-string">&quot;load&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">rosparam</span> <span class="hljs-attr">file</span>=<span class="hljs-string">&quot;$(find racecar_gazebo)/config/global_costmap_params.yaml&quot;</span> <span class="hljs-attr">command</span>=<span class="hljs-string">&quot;load&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">rosparam</span> <span class="hljs-attr">file</span>=<span class="hljs-string">&quot;$(find racecar_gazebo)/config/global_planner_params.yaml&quot;</span> <span class="hljs-attr">command</span>=<span class="hljs-string">&quot;load&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">rosparam</span> <span class="hljs-attr">file</span>=<span class="hljs-string">&quot;$(find racecar_gazebo)/config/teb_local_planner_params.yaml&quot;</span> <span class="hljs-attr">command</span>=<span class="hljs-string">&quot;load&quot;</span> /&gt;</span>
+  <span class="hljs-comment">&lt;!--&lt;rosparam file=&quot;$(find racecar_gazebo)/config/dwa_local_planner_params.yaml&quot; command=&quot;load&quot; /&gt;--&gt;</span>
+  
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;base_global_planner&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;global_planner/GlobalPlanner&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;planner_frequency&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;3.0&quot;</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;planner_patience&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;6.0&quot;</span> /&gt;</span>
+  <span class="hljs-comment">&lt;!--param name=&quot;use_dijkstra&quot; value=&quot;false&quot; /--&gt;</span>
+  
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;base_local_planner&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;teb_local_planner/TebLocalPlannerROS&quot;</span> /&gt;</span>
+  <span class="hljs-comment">&lt;!--&lt;param name=&quot;base_local_planner&quot; value=&quot;dwa_local_planner/DWAPlannerROS&quot; /&gt; --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;controller_frequency&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;10.0&quot;</span> /&gt;</span>
+  <span class="hljs-comment">&lt;!-- 5.0 15.0 --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;controller_patience&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;15.0&quot;</span> /&gt;</span>
+  
+  <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;clearing_rotation_allowed&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;false&quot;</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">node</span>&gt;</span></code></pre></div>
+
+<p>从上面可以看到，在启动move_base节点时，前四个参数是配置代价地图相关参数，首先加载了costmap_common_params.yaml到global_costmap和local_costmap两个命名空间中，因为该配置文件是一个通用的代价地图配置参数，即local_costmap和global_costmap都需要配置的参数。然后下面的local_costmap_params.yaml是专门为了局部代价地图配置的参数，global_costmap_params.yaml是专门为全局代价地图配置的参数。而后面三个是配置路径规划相关参数。</p>
+</li>
+</ul>
+<h4 id="代价地图配置"><a href="#代价地图配置" class="headerlink" title="代价地图配置"></a>代价地图配置</h4><ul>
+<li><p>costmap_common_params.yaml   代价地图通用配置文件</p>
+<div class="code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">footprint:</span> [[<span class="hljs-number">0.27</span>,<span class="hljs-number">0.23</span>], [<span class="hljs-number">0.27</span>,<span class="hljs-number">-0.23</span>], [<span class="hljs-number">-0.27</span>,<span class="hljs-number">-0.23</span>], [<span class="hljs-number">-0.27</span>,<span class="hljs-number">0.23</span>]]
+
+<span class="hljs-attr">transform_tolerance:</span> <span class="hljs-number">0.2</span>
+<span class="hljs-attr">map_type:</span> <span class="hljs-string">costmap</span>
+
+<span class="hljs-attr">obstacle_layer:</span>
+ <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+ <span class="hljs-attr">obstacle_range:</span> <span class="hljs-number">3.0</span>
+ <span class="hljs-attr">raytrace_range:</span> <span class="hljs-number">3.5</span>
+ <span class="hljs-attr">inflation_radius:</span> <span class="hljs-number">0.2</span>
+ <span class="hljs-attr">track_unknown_space:</span> <span class="hljs-literal">false</span>
+ <span class="hljs-attr">combination_method:</span> <span class="hljs-number">1</span>
+
+ <span class="hljs-attr">observation_sources:</span> <span class="hljs-string">laser_scan_sensor</span>
+ <span class="hljs-attr">laser_scan_sensor:</span> &#123;<span class="hljs-attr">data_type:</span> <span class="hljs-string">LaserScan</span>, <span class="hljs-attr">topic:</span> <span class="hljs-string">scan</span>, <span class="hljs-attr">marking:</span> <span class="hljs-literal">true</span>, <span class="hljs-attr">clearing:</span> <span class="hljs-literal">true</span>, <span class="hljs-attr">truemin_obstacle_height:</span> <span class="hljs-number">-1</span>, <span class="hljs-attr">max_obstacle_height:</span> <span class="hljs-number">1</span>&#125;
+
+<span class="hljs-attr">inflation_layer:</span>
+  <span class="hljs-attr">enabled:</span>              <span class="hljs-literal">true</span>
+  <span class="hljs-attr">cost_scaling_factor:</span>  <span class="hljs-number">10.0</span>  <span class="hljs-comment"># exponential rate at which the obstacle cost drops off (default: 10)</span>
+  <span class="hljs-attr">inflation_radius:</span>     <span class="hljs-number">0.45</span>  <span class="hljs-comment"># max. distance from an obstacle at which costs are incurred for planning paths.</span>
+
+<span class="hljs-attr">static_layer:</span>
+  <span class="hljs-attr">enabled:</span>              <span class="hljs-literal">true</span>
+  <span class="hljs-attr">map_topic:</span>            <span class="hljs-string">&quot;/map&quot;</span></code></pre></div>
+
+<p>下面来依次解释下各参数的意义：</p>
+<ul>
+<li><p><strong>footprint</strong>：每一个坐标代表机器人上的一点，设置机器人的中心为[0,0]，根据机器人不同的形状，找到机器人各凸出的坐标点即可，具体可参考下图来设置(如果是圆形底盘机器人，直接设置半径大小即可：例如 <strong>robot_radius: 0.5</strong>)：</p>
+<p><a target="_blank" rel="noopener" href="https://s2.ax1x.com/2019/06/01/V3CLrT.png"><img src="https://i.loli.net/2020/08/04/rIRimT4w2f1GlL9.png" srcset="/img/loading.gif" lazyload alt="V3CLrT.png"></a></p>
+</li>
+<li><p><strong>map_type</strong>: 地图类型，这里为<code>costmap</code>(代价地图)。另一种地图类型为为<code>voxel</code>(体素地图)。这两者之间的区别是前者是世界的2D表示，后者为世界的3D表示。</p>
+</li>
+<li><p><strong>obstacle_layer</strong>：配置障碍物图层</p>
+<ul>
+<li><em>enabled</em>: 是否启用该层</li>
+<li><em>combination_method(default: 1)</em>: 只能设置为0或1，用来更新地图上的代价值，一般设置为1;</li>
+<li><em>track_unknown_space (default: false)</em>: 如果设置为false，那么地图上代价值就只分为致命碰撞和自由区域两种，如果设置为true，那么就分为致命碰撞，自由区域和未知区域三种。意思是说假如该参数设置为false的话，就意味着地图上的未知区域也会被认为是可以自由移动的区域，这样在进行全局路径规划时，可以把一些未探索的未知区域也来参与到路径规划，如果你需要这样的话就将该参数设置为false。不过一般情况未探索的区域不应该当作可以自由移动的区域，因此一般将该参数设置为true;</li>
+<li><em>obstacle_range(default: 2.5)</em>: 设置机器人检测障碍物的最大范围，意思是说超过该范围的障碍物，并不进行检测，只有靠近到该范围内才把该障碍物当作影响路径规划和移动的障碍物;</li>
+<li><em>raytrace_range(default: 3.0)</em>: 在机器人移动过程中，实时清除代价地图上的障碍物的最大范围，更新可自由移动的空间数据。假如设置该值为3米，那么就意味着在3米内的障碍物，本来开始时是有的，但是本次检测却没有了，那么就需要在代价地图上来更新，将旧障碍物的空间标记为可以自由移动的空间</li>
+<li><em>observation_sources</em>: 设置导航中所使用的传感器，这里可以用逗号形式来区分开很多个传感器，例如激光雷达，碰撞传感器，超声波传感器等，我这里只设置了激光雷达;<ul>
+<li>data_type: 激光雷达数据类型;</li>
+<li>topic: 该激光雷达发布的话题名;</li>
+<li>marking: 是否可以使用该传感器来标记障碍物;</li>
+<li>clearing: 是否可以使用该传感器来清除障碍物标记为自由空间;</li>
+<li><em>max_obstacle_height(default: 2.0)</em>: 以米为单位插入costmap的任何障碍物的最大高度。此参数应设置为略高于机器人的高度。</li>
+<li><em>min_obstacle_height</em>: 传感器读数的最小高度（以米为单位）视为有效。通常设置为地面高度。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>inflation_layer</strong>: 膨胀层，用于在障碍物外标记一层危险区域，在路径规划时需要避开该危险区域</p>
+<ul>
+<li><p><em>enabled</em>: 是否启用该层;</p>
+</li>
+<li><p><em>cost_scaling_factor(default: 10.0)</em>: 膨胀过程中应用到代价值的比例因子，代价地图中到实际障碍物距离在内切圆半径到膨胀半径之间的所有cell可以使用如下公式来计算膨胀代价：</p>
+<p>exp(-1.0 * cost_scaling_factor * (distance_from_obstacle – inscribed_radius)) * (costmap_2d::INSCRIBED_INFLATED_OBSTACLE – 1)</p>
+<p>公式中costmap_2d::INSCRIBED_INFLATED_OBSTACLE目前指定为254，</p>
+<p>注意： 由于在公式中cost_scaling_factor被乘了一个负数，所以增大比例因子反而会降低代价。</p>
+</li>
+<li><p><em>inflation_radius(default: 0.55)</em>: 膨胀半径，膨胀层会把障碍物代价膨胀直到该半径为止，一般将该值设置为机器人底盘的直径大小。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Static_layer</strong>: 静态地图层，即SLAM中构建的地图层</p>
+<ul>
+<li><em>enabled</em>: 是否启用该地图层;</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>global_costmap_params.yaml   全局代价地图配置文件</p>
+<div class="code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">global_costmap:</span>
+  <span class="hljs-attr">global_frame:</span> <span class="hljs-string">map</span>
+  <span class="hljs-attr">robot_base_frame:</span> <span class="hljs-string">base_footprint</span>
+  <span class="hljs-attr">update_frequency:</span> <span class="hljs-number">3.0</span>
+  <span class="hljs-attr">publish_frequency:</span> <span class="hljs-number">2.0</span>
+  <span class="hljs-attr">static_map:</span> <span class="hljs-literal">true</span>
+ 
+  <span class="hljs-attr">transform_tolerance:</span> <span class="hljs-number">0.5</span>
+  <span class="hljs-attr">plugins:</span>
+    <span class="hljs-bullet">-</span> &#123;<span class="hljs-attr">name:</span> <span class="hljs-string">static_layer</span>,            <span class="hljs-attr">type:</span> <span class="hljs-string">&quot;costmap_2d::StaticLayer&quot;</span>&#125;
+    <span class="hljs-bullet">-</span> &#123;<span class="hljs-attr">name:</span> <span class="hljs-string">obstacle_layer</span>,          <span class="hljs-attr">type:</span> <span class="hljs-string">&quot;costmap_2d::VoxelLayer&quot;</span>&#125;
+    <span class="hljs-bullet">-</span> &#123;<span class="hljs-attr">name:</span> <span class="hljs-string">inflation_layer</span>,         <span class="hljs-attr">type:</span> <span class="hljs-string">&quot;costmap_2d::InflationLayer&quot;</span>&#125;</code></pre></div>
+
+<p>下面是该全局代价地图配置文件中各参数的意义：</p>
+<ul>
+<li><strong>global_frame</strong>：全局代价地图需要在哪个坐标系下运行；</li>
+<li><strong>robot_base_frame</strong>：在全局代价地图中机器人本体的基坐标系，就是机器人上的根坐标系。通过global_frame和robot_base_frame就可以计算两个坐标系之间的变换，得知机器人在全局坐标系中的坐标了；</li>
+<li><strong>update_frequency</strong>：全局代价地图更新频率(单位:Hz），一般全局代价地图更新频率设置的比较小；</li>
+<li><strong>publish_frequency</strong>：全局代价地图发布的频率(单位:Hz）。</li>
+<li><strong>static_map</strong>：配置是否使用map_server提供的地图来初始化;如果不需要使用已有的地图或者map_server，最好设置为false；</li>
+<li><strong>rolling_window</strong>：是否在机器人移动过程中需要滚动窗口，始终保持机器人在当前窗口中心位置；</li>
+<li><strong>transform_tolerance</strong>：坐标系间的转换可以忍受的最大延时。</li>
+<li><strong>plugins</strong>：在global_costmap中使用下面三个插件来融合三个不同图层，分别是static_layer、obstacle_layer和inflation_layer，合成一个master_layer来进行全局路径规划。</li>
+</ul>
+</li>
+<li><p>local_costmap_params.yaml   本地代价地图配置文件</p>
+<div class="code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">local_costmap:</span>
+  <span class="hljs-attr">global_frame:</span> <span class="hljs-string">map</span>
+  <span class="hljs-attr">robot_base_frame:</span> <span class="hljs-string">base_footprint</span>
+  <span class="hljs-attr">update_frequency:</span> <span class="hljs-number">5.0</span>
+  <span class="hljs-attr">publish_frequency:</span> <span class="hljs-number">3.0</span>
+  <span class="hljs-attr">static_map:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">rolling_window:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">width:</span> <span class="hljs-number">5.0</span>
+  <span class="hljs-attr">height:</span> <span class="hljs-number">5.0</span>
+  <span class="hljs-attr">resolution:</span> <span class="hljs-number">0.1</span>
+  <span class="hljs-attr">transform_tolerance:</span> <span class="hljs-number">0.5</span>
+  
+  <span class="hljs-attr">plugins:</span>
+   <span class="hljs-bullet">-</span> &#123;<span class="hljs-attr">name:</span> <span class="hljs-string">static_layer</span>,        <span class="hljs-attr">type:</span> <span class="hljs-string">&quot;costmap_2d::StaticLayer&quot;</span>&#125;
+   <span class="hljs-bullet">-</span> &#123;<span class="hljs-attr">name:</span> <span class="hljs-string">obstacle_layer</span>,      <span class="hljs-attr">type:</span> <span class="hljs-string">&quot;costmap_2d::ObstacleLayer&quot;</span>&#125;</code></pre></div>
+
+<p>下面是详细解释每个参数的意义：</p>
+<ul>
+<li><strong>global_frame</strong>：在局部代价地图中的全局坐标系，一般需要设置为odom_frame;</li>
+<li><strong>robot_base_frame</strong>：机器人本体的基坐标系;</li>
+<li><strong>update_frequency</strong>：局部代价地图的更新频率;</li>
+<li><strong>publish_frequency</strong>：局部代价地图的发布频率;</li>
+<li><strong>static_map</strong>：局部代价地图一般不设置为静态地图，因为需要检测是否在机器人附近有新增的动态障碍物;</li>
+<li><strong>rolling_window</strong>：使用滚动窗口，始终保持机器人在当前局部地图的中心位置;</li>
+<li><strong>width</strong>：滚动窗口的宽度，单位是米;</li>
+<li><strong>height</strong>：滚动窗口的高度，单位是米;</li>
+<li><strong>resolution</strong>：地图的分辨率，该分辨率可以从加载的地图相对应的配置文件中获取到;</li>
+<li><strong>transform_tolerance</strong>：局部代价地图中的坐标系之间转换的最大可忍受延时;</li>
+<li><strong>plugins</strong>：在局部代价地图中，不需要静态地图层，因为我们使用滚动窗口来不断的扫描障碍物，所以就需要融合两层地图（inflation_layer和obstacle_layer）即可，融合后的地图用于进行局部路径规划。</li>
+</ul>
+</li>
+</ul>
+<h4 id="全局规划器配置"><a href="#全局规划器配置" class="headerlink" title="全局规划器配置"></a>全局规划器配置</h4><ul>
+<li><p>global_planner_params.yaml  全局路径规划配置文件</p>
+<div class="code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">GlobalPlanner:</span>
+  <span class="hljs-attr">allow_unknown:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">default_tolerance:</span> <span class="hljs-number">0.2</span>
+  <span class="hljs-attr">visualize_potential:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">use_dijkstra:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">use_quadratic:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">use_grid_path:</span> <span class="hljs-literal">false</span>
+  <span class="hljs-attr">old_navfn_behavior:</span> <span class="hljs-literal">false</span>
+ 
+  <span class="hljs-attr">lethal_cost:</span> <span class="hljs-number">253</span>
+  <span class="hljs-attr">neutral_cost:</span> <span class="hljs-number">66</span>
+  <span class="hljs-attr">cost_factor:</span> <span class="hljs-number">0.55</span>
+  
+  <span class="hljs-attr">publish_potential:</span> <span class="hljs-literal">true</span>
+  <span class="hljs-attr">orientation_mode:</span> <span class="hljs-number">0</span>
+  <span class="hljs-attr">orientation_window_size:</span> <span class="hljs-number">1</span></code></pre></div>
+
+<p>下面来依次解释下各参数意义：</p>
+<ul>
+<li><strong>allow_unknown(default: true)</strong>: 是否允许规划器规划穿过未知区域的路径,只设计该参数为true还不行,还要在costmap_commons_params.yaml中设置track_unknown_space参数也为false才行。</li>
+<li><strong>default_tolerance(default: 0.0)</strong>: 当设置的目的地被障碍物占据时,需要以该参数为半径寻找到最近的点作为新目的地点.</li>
+<li><strong>visualize_potential(default: false)</strong>: 是否显示从PointCloud2计算得到的势区域.</li>
+<li><strong>use_dijkstra(default: true)</strong>: 如果设置为true,将使用dijkstra算法,否则使用A*算法.</li>
+<li><strong>use_quadratic(default: true)</strong>: 如果设置为true,将使用二次函数近似函数,否则使用更加简单的计算方式,这样节省硬件计算资源.</li>
+<li><strong>use_grid_path(default: false)</strong>: 如果如果设置为true,则会规划一条沿着网格边界的路径,偏向于直线穿越网格,否则将使用梯度下降算法,路径更为光滑点.</li>
+<li><strong>old_navfn_behavior(default: false)</strong>: 若在某些情况下,想让global_planner完全复制navfn的功能,那就设置为true,但是需要注意navfn是非常旧的ROS系统中使用的,现在已经都用global_planner代替navfn了,所以不建议设置为true.</li>
+<li><strong>lethal_cost(default: 253)</strong>: 致命代价值</li>
+<li><strong>neutral_cost(default: 50)</strong>: 中等代价值</li>
+<li><strong>cost_factor(default: 3.0)</strong>: 代价地图与每个代价值相乘的因子</li>
+<li><strong>publish_potential(default: true)</strong>: 是否发布costmap的势函数</li>
+<li><strong>orientation_mode(default: 0)</strong>: 如何设置每个点的方向（None &#x3D; 0,Forward &#x3D; 1,Interpolate &#x3D; 2,ForwardThenInterpolate &#x3D; 3,Backward &#x3D; 4,Leftward &#x3D; 5,Rightward &#x3D; 6）</li>
+<li><strong>orientation_window_size(default: 1)</strong>: 根据orientation_mode指定的位置积分来得到使用窗口的方向。</li>
+</ul>
+</li>
+</ul>
+<h4 id="局部规划器配置"><a href="#局部规划器配置" class="headerlink" title="局部规划器配置"></a>局部规划器配置</h4><ul>
+<li><p>teb_local_planner_params.yaml TEB局部路径规划配置文件</p>
+<p><em>关于teb和dwa的调参同样可以使用rqt_reconfigure实现</em></p>
+<p><img src="https://i.loli.net/2020/08/05/x6IunsDvTafHgSB.png" srcset="/img/loading.gif" lazyload alt="image-20200805150542853"></p>
+</li>
+</ul>
+<p>关于TEB_local_planner的调整网上有很多但都参差不齐，大家可以自己google一下，博主提供的源码包里没有用teb进行运动控制，只利用了它规划出的局部路径所以这一块也没有调的很明白，我把ROS Wiki上的teb_local_planner参数说明做了一个表方便大家查阅：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>含义</th>
+<th>最小</th>
+<th>默认</th>
+<th>最大</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>teb_autosize</td>
+<td>bool</td>
+<td>优化期间允许改变轨迹的时域长度；Enable the automatic resizing of the trajectory during optimization (based on the temporal resolution of the trajectory, recommended)</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr>
+<td>dt_ref</td>
+<td>double</td>
+<td>局部路径规划的解析度;Temporal resolution of the planned trajectory (usually it is set to the magnitude of the 1&#x2F;control_rate)</td>
+<td>0.01</td>
+<td>0.3</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>dt_hysteresis</td>
+<td>double</td>
+<td>允许改变的时域解析度的浮动范围， 一般为 dt_ref 的 10% 左右; Hysteresis that is utilized for automatic resizing depending on the current temporal resolution (dt): usually 10% of dt_ref</td>
+<td>0.002</td>
+<td>0.1</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>global_plan_overwrite_orientation</td>
+<td>bool</td>
+<td>覆盖全局路径中局部路径点的朝向，Some global planners are not considering the orientation at local subgoals between start and global goal, therefore determine it automatically</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr>
+<td>allow_init_with_backwards_motion</td>
+<td>bool</td>
+<td>允许在开始时想后退来执行轨迹，If true, the underlying trajectories might be initialized with backwards motions in case the goal is behind the start within the local costmap (this is only recommended if the robot is equipped with rear sensors)</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td>max_global_plan_lookahead_dist</td>
+<td>double</td>
+<td>考虑优化的全局计划子集的最大长度（累积欧几里得距离）（如果为0或负数：禁用；长度也受本地Costmap大小的限制）， Specify maximum length (cumulative Euclidean distances) of the subset of the global plan taken into account for optimization [if 0 or negative: disabled; the length is also bounded by the local costmap size ]</td>
+<td>0.0</td>
+<td>3.0</td>
+<td>50.0</td>
+</tr>
+<tr>
+<td>force_reinit_new_goal_dist</td>
+<td>double</td>
+<td>如果上一个目标的间隔超过指定的米数（跳过热启动），则强制规划器重新初始化轨迹，Force the planner to reinitialize the trajectory if a previous goal is updated with a seperation of more than the specified value in meters (skip hot-starting)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>feasibility_check_no_poses</td>
+<td>int</td>
+<td>检测位姿可到达的时间间隔，Specify up to which pose on the predicted plan the feasibility should be checked each sampling interval</td>
+<td>0</td>
+<td>5</td>
+<td>50</td>
+</tr>
+<tr>
+<td>exact_arc_length</td>
+<td>bool</td>
+<td>如果为真，规划器在速度、加速度和转弯率计算中使用精确的弧长[-&gt;增加的CPU时间]，否则使用欧几里德近似。If true, the planner uses the exact arc length in velocity, acceleration and turning rate computations [-&gt; increased cpu time], otherwise the euclidean approximation is used.</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>publish_feedback</th>
+<th>bool</th>
+<th>发布包含完整轨迹和活动障碍物列表的规划器反馈，Publish planner feedback containing the full trajectory and a list of active obstacles (should be enabled only for evaluation or debugging purposes)</th>
+<th>False</th>
+<th>False</th>
+<th>True</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>visualize_with_time_as_z_axis_scale</td>
+<td>double</td>
+<td>如果该值大于0，则使用该值缩放的Z轴的时间在3D中可视化轨迹和障碍物。最适用于动态障碍。 If this value is bigger than 0, the trajectory and obstacles are visualized in 3d using the time as the z-axis scaled by this value. Most useful for dynamic obstacles.</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>global_plan_viapoint_sep</td>
+<td>double</td>
+<td>从全局计划中提取的每两个连续通过点之间的最小间隔[如果为负：禁用]， Min. separation between each two consecutive via-points extracted from the global plan [if negative: disabled]</td>
+<td>-0.1</td>
+<td>-0.1</td>
+<td>5.0</td>
+</tr>
+<tr>
+<td>via_points_ordered</td>
+<td>bool</td>
+<td>如果为真，规划器遵循存储容器中通过点的顺序。If true, the planner adheres to the order of via-points in the storage container</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td>max_vel_x</td>
+<td>double</td>
+<td>最大x前向速度，Maximum translational velocity of the robot</td>
+<td>0.01</td>
+<td>0.4</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>max_vel_x_backwards</td>
+<td>double</td>
+<td>最大x后退速度，Maximum translational velocity of the robot for driving backwards</td>
+<td>0.01</td>
+<td>0.2</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>max_vel_theta</td>
+<td>double</td>
+<td>最大转向叫速度 Maximum angular velocity of the robot</td>
+<td>0.01</td>
+<td>0.3</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>acc_lim_x</td>
+<td>double</td>
+<td>最大x加速度，Maximum translational acceleration of the robot</td>
+<td>0.01</td>
+<td>0.5</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>acc_lim_theta</td>
+<td>double</td>
+<td>最大角速度，Maximum angular acceleration of the robot</td>
+<td>0.01</td>
+<td>0.5</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>is_footprint_dynamic</td>
+<td>bool</td>
+<td>是否footprint 为动态的，If true, updated the footprint before checking trajectory feasibility</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>min_turning_radius</th>
+<th>double</th>
+<th><strong>车类机器人的最小转弯半径，Minimum turning radius of a carlike robot (diff-drive robot: zero)</strong></th>
+<th>0.0</th>
+<th>0.0</th>
+<th>50.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>wheelbase</td>
+<td>double</td>
+<td>驱动轴和转向轴之间的距离（仅适用于启用了“Cmd_angle_而不是_rotvel”的Carlike机器人）；对于后轮式机器人，该值可能为负值！ The distance between the drive shaft and steering axle (only required for a carlike robot with ‘cmd_angle_instead_rotvel’ enabled); The value might be negative for back-wheeled robots</td>
+<td>-10.0</td>
+<td>1.0</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>cmd_angle_instead_rotvel</td>
+<td>bool</td>
+<td>将收到的角速度消息转换为 操作上的角度变化。 Substitute the rotational velocity in the commanded velocity message by the corresponding steering angle (check ‘axles_distance’)</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td>max_vel_y</td>
+<td>double</td>
+<td>最大y方向速度， Maximum strafing velocity of the robot (should be zero for non-holonomic robots!)</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>acc_lim_y</td>
+<td>double</td>
+<td>最大y向加速度， Maximum strafing acceleration of the robot</td>
+<td>0.01</td>
+<td>0.5</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>xy_goal_tolerance</td>
+<td>double</td>
+<td>目标 xy 偏移容忍度，Allowed final euclidean distance to the goal position</td>
+<td>0.001</td>
+<td>0.2</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>yaw_goal_tolerance</td>
+<td>double</td>
+<td>目标 角度 偏移容忍度， Allowed final orientation error to the goal orientation</td>
+<td>0.001</td>
+<td>0.1</td>
+<td>3.2</td>
+</tr>
+<tr>
+<td>free_goal_vel</td>
+<td>bool</td>
+<td>允许机器人以最大速度驶向目的地， Allow the robot’s velocity to be nonzero for planning purposes (the robot can arrive at the goal with max speed)</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td>min_obstacle_dist</td>
+<td>double</td>
+<td>和障碍物最小距离， Minimum desired separation from obstacles</td>
+<td>0.0</td>
+<td>0.5</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>inflation_dist</td>
+<td>double</td>
+<td>障碍物膨胀距离， Buffer zone around obstacles with non-zero penalty costs (should be larger than min_obstacle_dist in order to take effect)</td>
+<td>0.0</td>
+<td>0.6</td>
+<td>15.0</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">include_dynamic_obstacles</th>
+<th>bool</th>
+<th>是否将动态障碍物预测为速度模型， Specify whether the movement of dynamic obstacles should be predicted by a constant velocity model (this also changes the homotopy class search). If false, all obstacles are considered to be static.</th>
+<th>False</th>
+<th>False</th>
+<th>True</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">include_costmap_obstacles</td>
+<td>bool</td>
+<td>costmap 中的障碍物是否被直接考虑， Specify whether the obstacles in the costmap should be taken into account directly (this is necessary if no seperate clustering and detection is implemented)</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr>
+<td align="left">legacy_obstacle_association</td>
+<td>bool</td>
+<td>是否严格遵循局部规划出来的路径， If true, the old association strategy is used (for each obstacle, find the nearest TEB pose), otherwise the new one (for each teb pose, find only ‘relevant’ obstacles).</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td align="left">obstacle_association_force_inclusion_factor</td>
+<td>double</td>
+<td>The non-legacy obstacle association technique tries to connect only relevant obstacles with the discretized trajectory during optimization, all obstacles within a specifed distance are forced to be included (as a multiple of min_obstacle_dist), e.g. choose 2.0 in order to consider obstacles within a radius of 2.0*min_obstacle_dist.</td>
+<td>0.0</td>
+<td>1.5</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td align="left">obstacle_association_cutoff_factor</td>
+<td>double</td>
+<td>See obstacle_association_force_inclusion_factor, but beyond a multiple of [value]*min_obstacle_dist all obstacles are ignored during optimization. obstacle_association_force_inclusion_factor is processed first.</td>
+<td>1.0</td>
+<td>5.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td align="left">costmap_obstacles_behind_robot_dist</td>
+<td>double</td>
+<td>Limit the occupied local costmap obstacles taken into account for planning behind the robot (specify distance in meters)</td>
+<td>0.0</td>
+<td>1.5</td>
+<td>20.0</td>
+</tr>
+<tr>
+<td align="left">obstacle_poses_affected</td>
+<td>int</td>
+<td>The obstacle position is attached to the closest pose on the trajectory to reduce computational effort, but take a number of neighbors into account as well</td>
+<td>0</td>
+<td>30</td>
+<td>200</td>
+</tr>
+<tr>
+<td align="left">no_inner_iterations</td>
+<td>int</td>
+<td>被外循环调用后内循环执行优化次数， Number of solver iterations called in each outerloop iteration</td>
+<td>1</td>
+<td>5</td>
+<td>100</td>
+</tr>
+<tr>
+<td align="left">no_outer_iterations</td>
+<td>int</td>
+<td>执行的外循环的优化次数， Each outerloop iteration automatically resizes the trajectory and invokes the internal optimizer with no_inner_iterations</td>
+<td>1</td>
+<td>4</td>
+<td>100</td>
+</tr>
+<tr>
+<td align="left">optimization_activate</td>
+<td>bool</td>
+<td>激活优化， Activate the optimization</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>optimization_verbose</th>
+<th>bool</th>
+<th>打印优化过程详情， Print verbose information</th>
+<th>False</th>
+<th>False</th>
+<th>True</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>penalty_epsilon</td>
+<td>double</td>
+<td>对于硬约束近似，在惩罚函数中添加安全范围， Add a small safty margin to penalty functions for hard-constraint approximations</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>weight_max_vel_x</td>
+<td>double</td>
+<td>最大x速度权重， Optimization weight for satisfying the maximum allowed translational velocity</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_max_vel_y</td>
+<td>double</td>
+<td>最大y速度权重，Optimization weight for satisfying the maximum allowed strafing velocity (in use only for holonomic robots)</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_max_vel_theta</td>
+<td>double</td>
+<td>最大叫速度权重， Optimization weight for satisfying the maximum allowed angular velocity</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_acc_lim_x</td>
+<td>double</td>
+<td>最大x 加速度权重，Optimization weight for satisfying the maximum allowed translational acceleration</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_acc_lim_y</td>
+<td>double</td>
+<td>最大y 加速度权重，Optimization weight for satisfying the maximum allowed strafing acceleration (in use only for holonomic robots)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_acc_lim_theta</td>
+<td>double</td>
+<td>最大角速度权重，Optimization weight for satisfying the maximum allowed angular acceleration</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_kinematics_nh</td>
+<td>double</td>
+<td>Optimization weight for satisfying the non-holonomic kinematics</td>
+<td>0.0</td>
+<td>1000.0</td>
+<td>10000.0</td>
+</tr>
+<tr>
+<td>weight_kinematics_forward_drive</td>
+<td>double</td>
+<td>优化过程中，迫使机器人只选择前进方向，差速轮适用，Optimization weight for forcing the robot to choose only forward directions (positive transl. velocities, only diffdrive robot)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>weight_kinematics_turning_radius</th>
+<th>double</th>
+<th><strong>优化过程中，车型机器人的最小转弯半径的权重。 Optimization weight for enforcing a minimum turning radius (carlike robots)</strong></th>
+<th>0.0</th>
+<th>1.0</th>
+<th>1000.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>weight_optimaltime</td>
+<td>double</td>
+<td>优化过程中，基于轨迹的时间上的权重， Optimization weight for contracting the trajectory w.r.t transition time</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_obstacle</td>
+<td>double</td>
+<td>优化过程中，和障碍物最小距离的权重，Optimization weight for satisfying a minimum seperation from obstacles</td>
+<td>0.0</td>
+<td>50.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_inflation</td>
+<td>double</td>
+<td>优化过程中， 膨胀区的权重，Optimization weight for the inflation penalty (should be small)</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>weight_dynamic_obstacle</td>
+<td>double</td>
+<td>优化过程中，和动态障碍物最小距离的权重，Optimization weight for satisfying a minimum seperation from dynamic obstacles</td>
+<td>0.0</td>
+<td>50.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_dynamic_obstacle_inflation</td>
+<td>double</td>
+<td>优化过程中，和动态障碍物膨胀区的权重，Optimization weight for the inflation penalty of dynamic obstacles (should be small)</td>
+<td>0.0</td>
+<td>0.1</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td><em><strong>weight_viapoint</strong></em></td>
+<td>double</td>
+<td>优化过程中，和全局路径采样点距离的权重， Optimization weight for minimizing the distance to via-points</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>weight_adapt_factor</td>
+<td>double</td>
+<td>Some special weights (currently ‘weight_obstacle’) are repeatedly scaled by this factor in each outer TEB iteration (weight_new: weight_old * factor); Increasing weights iteratively instead of setting a huge value a-priori leads to better numerical conditions of the underlying optimization problem.</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>enable_multithreading</td>
+<td>bool</td>
+<td>允许多线程并行处理， Activate multiple threading for planning multiple trajectories in parallel</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr>
+<td>max_number_classes</td>
+<td>int</td>
+<td>允许的线程数， Specify the maximum number of allowed alternative homotopy classes (limits computational effort)</td>
+<td>1</td>
+<td>5</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>selection_cost_hysteresis</th>
+<th>double</th>
+<th>Specify how much trajectory cost must a new candidate have w.r.t. a previously selected trajectory in order to be selected (selection if new_cost &lt; old_cost*factor)</th>
+<th>0.0</th>
+<th>1.0</th>
+<th>2.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>selection_prefer_initial_plan</td>
+<td>double</td>
+<td>Specify a cost reduction in the interval (0,1) for the trajectory in the equivalence class of the initial plan.)</td>
+<td>0.0</td>
+<td>0.95</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>selection_obst_cost_scale</td>
+<td>double</td>
+<td>Extra scaling of obstacle cost terms just for selecting the ‘best’ candidate (new_obst_cost: obst_cost*factor)</td>
+<td>0.0</td>
+<td>100.0</td>
+<td>1000.0</td>
+</tr>
+<tr>
+<td>selection_viapoint_cost_scale</td>
+<td>double</td>
+<td>Extra scaling of via-point cost terms just for selecting the ‘best’ candidate. (new_viapt_cost: viapt_cost*factor)</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>selection_alternative_time_cost</td>
+<td>bool</td>
+<td>If true, time cost is replaced by the total transition time.</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td>switching_blocking_period</td>
+<td>double</td>
+<td>Specify a time duration in seconds that needs to be expired before a switch to new equivalence class is allowed</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>60.0</td>
+</tr>
+<tr>
+<td>roadmap_graph_no_samples</td>
+<td>int</td>
+<td>Specify the number of samples generated for creating the roadmap graph, if simple_exploration is turend off</td>
+<td>1</td>
+<td>15</td>
+<td>100</td>
+</tr>
+<tr>
+<td>roadmap_graph_area_width</td>
+<td>double</td>
+<td>Specify the width of the area in which sampled will be generated between start and goal [m ] (the height equals the start-goal distance)</td>
+<td>0.1</td>
+<td>5.0</td>
+<td>20.0</td>
+</tr>
+<tr>
+<td>roadmap_graph_area_length_scale</td>
+<td>double</td>
+<td>矩形区域的长度取决于起点和目标之间的距离。 此参数进一步缩放距离，以使几何中心保持相等！The length of the rectangular region is determined by the distance between start and goal. This parameter further scales the distance such that the geometric center remains equal!)</td>
+<td>0.5</td>
+<td>1.0</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>h_signature_prescaler</td>
+<td>double</td>
+<td>标度障碍物的数量，以允许数量巨大的障碍物。 不要选择太低，否则无法将障碍物彼此区分开（0.2 &lt;H &lt;&#x3D; 1）Scale number of obstacle value in order to allow huge number of obstacles. Do not choose it extremly low, otherwise obstacles cannot be distinguished from each other (0.2&lt;H&lt;&#x3D;1)</td>
+<td>0.2</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>h_signature_threshold</th>
+<th>double</th>
+<th>如果实部和复数部分的差都低于指定的阈值，则假设两个h-符号相等Two h-signuteres are assumed to be equal, if both the difference of real parts and complex parts are below the specified threshold</th>
+<th>0.0</th>
+<th>0.1</th>
+<th>1.0</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>obstacle_heading_threshold</td>
+<td>double</td>
+<td>指定障碍物航向和目标航向之间的归一化标量积的值，以便将它们(障碍物)考虑在内进行探索Specify the value of the normalized scalar product between obstacle heading and goal heading in order to take them (obstacles) into account for exploration</td>
+<td>0.0</td>
+<td>0.45</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>viapoints_all_candidates</td>
+<td>bool</td>
+<td>如果为TRUE，则将不同拓扑的所有轨迹附加到通过点集合，否则仅附加与初始&#x2F;全局计划共享相同的轨迹(在TEST_OPTIM_NODE中无效)。If true, all trajectories of different topologies are attached to the set of via-points, otherwise only the trajectory sharing the same one as the initial&#x2F;global plan is attached (no effect in test_optim_node).</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr>
+<td>visualize_hc_graph</td>
+<td>bool</td>
+<td>可视化新创建的图Visualize the graph that is created for exploring new homotopy classes</td>
+<td>False</td>
+<td>False</td>
+<td>True</td>
+</tr>
+<tr>
+<td>shrink_horizon_backup</td>
+<td>bool</td>
+<td>当规划器检测到系统异常，允许缩小时域规划范围。Allows the planner to shrink the horizon temporary (50%) in case of automatically detected issues.</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+<tr>
+<td>oscillation_recovery</td>
+<td>bool</td>
+<td>尝试检测和解决振荡，Try to detect and resolve oscillations between multiple solutions in the same equivalence class (robot frequently switches between left&#x2F;right&#x2F;forward&#x2F;backwards).</td>
+<td>False</td>
+<td>True</td>
+<td>True</td>
+</tr>
+</tbody></table>
+<p>博主的teb配置：</p>
+<div class="code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">TebLocalPlannerROS:</span>
+
+ <span class="hljs-attr">odom_topic:</span> <span class="hljs-string">/odom111</span>
+    
+ <span class="hljs-comment"># Trajectory</span>
+  
+ <span class="hljs-attr">teb_autosize:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">dt_ref:</span> <span class="hljs-number">0.3</span>
+ <span class="hljs-attr">dt_hysteresis:</span> <span class="hljs-number">0.1</span>
+ <span class="hljs-attr">max_samples:</span> <span class="hljs-number">500</span>
+ <span class="hljs-attr">global_plan_overwrite_orientation:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">allow_init_with_backwards_motion:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">max_global_plan_lookahead_dist:</span> <span class="hljs-number">3.0</span>
+ <span class="hljs-attr">global_plan_viapoint_sep:</span> <span class="hljs-number">-1</span>
+ <span class="hljs-attr">global_plan_prune_distance:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">exact_arc_length:</span> <span class="hljs-literal">False</span>
+ <span class="hljs-attr">feasibility_check_no_poses:</span> <span class="hljs-number">2</span>
+ <span class="hljs-attr">publish_feedback:</span> <span class="hljs-literal">False</span>
+    
+ <span class="hljs-comment"># Robot</span>
+         
+ <span class="hljs-attr">max_vel_x:</span> <span class="hljs-number">0.5</span>
+ <span class="hljs-attr">max_vel_x_backwards:</span> <span class="hljs-number">0.2</span>
+ <span class="hljs-attr">max_vel_y:</span> <span class="hljs-number">0.0</span>
+ <span class="hljs-attr">max_vel_theta:</span> <span class="hljs-number">0.3</span> <span class="hljs-comment"># the angular velocity is also bounded by min_turning_radius in case of a carlike robot (r = v / omega)</span>
+ <span class="hljs-attr">acc_lim_x:</span> <span class="hljs-number">0.5</span>
+ <span class="hljs-attr">acc_lim_theta:</span> <span class="hljs-number">0.5</span>
+
+ <span class="hljs-comment"># ********************** Carlike robot parameters ********************</span>
+ <span class="hljs-attr">min_turning_radius:</span> <span class="hljs-number">0.15</span>        <span class="hljs-comment"># Min turning radius of the carlike robot (compute value using a model or adjust with rqt_reconfigure manually)</span>
+ <span class="hljs-attr">wheelbase:</span> <span class="hljs-number">0.31</span>                 <span class="hljs-comment"># Wheelbase of our robot</span>
+ <span class="hljs-attr">cmd_angle_instead_rotvel:</span> <span class="hljs-literal">True</span> <span class="hljs-comment"># stage simulator takes the angle instead of the rotvel as input (twist message)</span>
+ <span class="hljs-comment"># ********************************************************************</span>
+
+ <span class="hljs-attr">footprint_model:</span> <span class="hljs-comment"># types: &quot;point&quot;, &quot;circular&quot;, &quot;two_circles&quot;, &quot;line&quot;, &quot;polygon&quot;</span>
+   <span class="hljs-attr">type:</span> <span class="hljs-string">&quot;polygon&quot;</span>
+   <span class="hljs-attr">radius:</span> <span class="hljs-number">0.2</span> <span class="hljs-comment"># for type &quot;circular&quot;</span>
+   <span class="hljs-attr">line_start:</span> [<span class="hljs-number">0.5</span>, <span class="hljs-number">0.0</span>] <span class="hljs-comment"># for type &quot;line&quot;</span>
+   <span class="hljs-attr">line_end:</span> [<span class="hljs-number">-0.08</span>, <span class="hljs-number">0.0</span>] <span class="hljs-comment"># for type &quot;line&quot;</span>
+   <span class="hljs-attr">front_offset:</span> <span class="hljs-number">0.2</span> <span class="hljs-comment"># for type &quot;two_circles&quot;</span>
+   <span class="hljs-attr">front_radius:</span> <span class="hljs-number">0.2</span> <span class="hljs-comment"># for type &quot;two_circles&quot;</span>
+   <span class="hljs-attr">rear_offset:</span> <span class="hljs-number">0.2</span> <span class="hljs-comment"># for type &quot;two_circles&quot;</span>
+   <span class="hljs-attr">rear_radius:</span> <span class="hljs-number">0.2</span> <span class="hljs-comment"># for type &quot;two_circles&quot;</span>
+   <span class="hljs-attr">vertices:</span> [[<span class="hljs-number">0.27</span>,<span class="hljs-number">0.23</span>], [<span class="hljs-number">0.27</span>,<span class="hljs-number">-0.23</span>], [<span class="hljs-number">-0.27</span>,<span class="hljs-number">-0.23</span>], [<span class="hljs-number">-0.27</span>,<span class="hljs-number">0.23</span>]] <span class="hljs-comment"># for type &quot;polygon&quot;</span>
+
+ <span class="hljs-comment"># GoalTolerance</span>
+    
+ <span class="hljs-attr">xy_goal_tolerance:</span> <span class="hljs-number">0.2</span>
+ <span class="hljs-attr">yaw_goal_tolerance:</span> <span class="hljs-number">0.1</span>
+ <span class="hljs-attr">free_goal_vel:</span> <span class="hljs-literal">False</span>
+ <span class="hljs-attr">complete_global_plan:</span> <span class="hljs-literal">True</span>
+    
+ <span class="hljs-comment"># Obstacles</span>
+    
+ <span class="hljs-attr">min_obstacle_dist:</span> <span class="hljs-number">0.05</span> <span class="hljs-comment"># This value must also include our robot&#x27;s expansion, since footprint_model is set to &quot;line&quot;.</span>
+ <span class="hljs-attr">inflation_dist:</span> <span class="hljs-number">0.5</span>
+ <span class="hljs-attr">include_costmap_obstacles:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">costmap_obstacles_behind_robot_dist:</span> <span class="hljs-number">1.0</span>
+ <span class="hljs-attr">obstacle_poses_affected:</span> <span class="hljs-number">5</span>
+
+ <span class="hljs-attr">dynamic_obstacle_inflation_dist:</span> <span class="hljs-number">0.6</span>
+ <span class="hljs-attr">include_dynamic_obstacles:</span> <span class="hljs-literal">True</span> 
+
+ <span class="hljs-attr">costmap_converter_plugin:</span> <span class="hljs-string">&quot;&quot;</span>
+ <span class="hljs-attr">costmap_converter_spin_thread:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">costmap_converter_rate:</span> <span class="hljs-number">5</span>
+
+ <span class="hljs-comment"># Optimization</span>
+    
+ <span class="hljs-attr">no_inner_iterations:</span> <span class="hljs-number">5</span>
+ <span class="hljs-attr">no_outer_iterations:</span> <span class="hljs-number">4</span>
+ <span class="hljs-attr">optimization_activate:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">optimization_verbose:</span> <span class="hljs-literal">False</span>
+ <span class="hljs-attr">penalty_epsilon:</span> <span class="hljs-number">0.1</span>
+ <span class="hljs-attr">obstacle_cost_exponent:</span> <span class="hljs-number">4</span>
+ <span class="hljs-attr">weight_max_vel_x:</span> <span class="hljs-number">2</span>
+ <span class="hljs-attr">weight_max_vel_theta:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">weight_acc_lim_x:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">weight_acc_lim_theta:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">weight_kinematics_nh:</span> <span class="hljs-number">1000</span>
+ <span class="hljs-attr">weight_kinematics_forward_drive:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">weight_kinematics_turning_radius:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">weight_optimaltime:</span> <span class="hljs-number">1</span> <span class="hljs-comment"># must be &gt; 0</span>
+ <span class="hljs-attr">weight_shortest_path:</span> <span class="hljs-number">0</span>
+ <span class="hljs-attr">weight_obstacle:</span> <span class="hljs-number">100</span>
+ <span class="hljs-attr">weight_inflation:</span> <span class="hljs-number">0.2</span>
+ <span class="hljs-attr">weight_dynamic_obstacle:</span> <span class="hljs-number">10</span> <span class="hljs-comment"># not in use yet</span>
+ <span class="hljs-attr">weight_dynamic_obstacle_inflation:</span> <span class="hljs-number">0.2</span>
+ <span class="hljs-attr">weight_viapoint:</span> <span class="hljs-number">1</span>
+ <span class="hljs-attr">weight_adapt_factor:</span> <span class="hljs-number">2</span>
+
+ <span class="hljs-comment"># Homotopy Class Planner</span>
+
+ <span class="hljs-attr">enable_homotopy_class_planning:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">enable_multithreading:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">max_number_classes:</span> <span class="hljs-number">4</span>
+ <span class="hljs-attr">selection_cost_hysteresis:</span> <span class="hljs-number">1.0</span>
+ <span class="hljs-attr">selection_prefer_initial_plan:</span> <span class="hljs-number">0.95</span>
+ <span class="hljs-attr">selection_obst_cost_scale:</span> <span class="hljs-number">1.0</span>
+ <span class="hljs-attr">selection_alternative_time_cost:</span> <span class="hljs-literal">False</span>
+
+ <span class="hljs-attr">roadmap_graph_no_samples:</span> <span class="hljs-number">15</span>
+ <span class="hljs-attr">roadmap_graph_area_width:</span> <span class="hljs-number">5</span>
+ <span class="hljs-attr">roadmap_graph_area_length_scale:</span> <span class="hljs-number">1.0</span>
+ <span class="hljs-attr">h_signature_prescaler:</span> <span class="hljs-number">0.5</span>
+ <span class="hljs-attr">h_signature_threshold:</span> <span class="hljs-number">0.1</span>
+ <span class="hljs-attr">obstacle_heading_threshold:</span> <span class="hljs-number">0.45</span>
+ <span class="hljs-attr">switching_blocking_period:</span> <span class="hljs-number">0.0</span>
+ <span class="hljs-attr">viapoints_all_candidates:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">delete_detours_backwards:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">max_ratio_detours_duration_best_duration:</span> <span class="hljs-number">3.0</span>
+ <span class="hljs-attr">visualize_hc_graph:</span> <span class="hljs-literal">False</span>
+ <span class="hljs-attr">visualize_with_time_as_z_axis_scale:</span> <span class="hljs-literal">False</span>
+
+<span class="hljs-comment"># Recovery</span>
+ 
+ <span class="hljs-attr">shrink_horizon_backup:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">shrink_horizon_min_duration:</span> <span class="hljs-number">10</span>
+ <span class="hljs-attr">oscillation_recovery:</span> <span class="hljs-literal">True</span>
+ <span class="hljs-attr">oscillation_v_eps:</span> <span class="hljs-number">0.1</span>
+ <span class="hljs-attr">oscillation_omega_eps:</span> <span class="hljs-number">0.1</span>
+ <span class="hljs-attr">oscillation_recovery_min_duration:</span> <span class="hljs-number">10</span>
+ <span class="hljs-attr">oscillation_filter_duration:</span> <span class="hljs-number">10</span>
+</code></pre></div>
+
+<p>至于其他局部路径规划器的配置建议参考网上的教程</p>
+<h3 id="Navigation-Global-Planner"><a href="#Navigation-Global-Planner" class="headerlink" title="Navigation - Global Planner"></a>Navigation - Global Planner</h3><p>依赖于<code>nav core::BaseGlobalPlanner</code>接口的全局规划器有3个：</p>
+<p>1.<code>carrot_planner</code></p>
+<p>2.<code>navfn</code></p>
+<p>3.<code>global planner</code></p>
+<p>比较常用的是后两个，博主提供的代码包用的是global planner</p>
+<h5 id="carrot-planner"><a href="#carrot-planner" class="headerlink" title="carrot_planner"></a>carrot_planner</h5><p>carrot_planner检查需要到达的目标是不是一个障碍物，如果是一个障碍物，它就将目标点替换成一个附近可接近的点。因此，这个模块其实并没有做任何全局规划的工作。在复杂的室内环境中，这个模块并不实用。</p>
+<h5 id="navfn"><a href="#navfn" class="headerlink" title="navfn"></a>navfn</h5><p><code>navfn</code>使用Dijkstra算法找到最短路径。</p>
+<h5 id="global-planner"><a href="#global-planner" class="headerlink" title="global planner"></a>global planner</h5><p><code>global planner</code>是<code>navfn</code>的升级版。它相对于<code>navfn</code>增加了更多的选项：</p>
+<p>1）支持A*算法；</p>
+<p>2）可以切换二次近似；</p>
+<p>3）切换网格路径；</p>
+<h5 id="navfn和global-planner"><a href="#navfn和global-planner" class="headerlink" title="navfn和global_planner"></a>navfn和global_planner</h5><p>关于navfn和global_planner的区别有一篇博客写的很清楚：<a target="_blank" rel="noopener" href="https://blog.csdn.net/heyijia0327/article/details/45030929">博文链接</a></p>
+<p>简单来说可以将navfn包和global_planner包理解成一个并列关系，因为他们两个都是用来做全局规划的，两个包里面也都实现了A*，Dijkstra算法。早期的开发中是用navfn包做导航的，那时候并没有global_planner这个包，并且在navfn的源代码里可以看到这个包默认是使用Dijkstra做全局路径规划，并且有A*的代码。但先前navfn里的A*算法存在bug，没人有时间去弄，到13年David Lu才完成了这部分工作，重新发布了global_planner包，修改好的代码封装性更强，更清晰明了，同时为了和以前兼容就没有用global_planner替换掉navfn。</p>
+<h4 id="Dijkstra-和-A"><a href="#Dijkstra-和-A" class="headerlink" title="Dijkstra 和 A*"></a>Dijkstra 和 A*</h4><p>关于Dijkstra算法和A*算法的原理这里就不再阐述了，有兴趣的朋友可以自行google</p>
+<p>这里主要通过图像和动画直观的看一下两种算法规划出的路径区别：</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/g024lzsknDo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<p>如果youtube视频感觉还不直观的话有一个github上搭建的项目可以很方便的可视化包括A*和Dijkstra算法在内的多种不同路径规划算法的区别，对于A*和Dijkstra算法还可以可视化其不同实现方式下规划的结果：<a target="_blank" rel="noopener" href="https://qiao.github.io/PathFinding.js/visual/">github传送门</a></p>
+<ul>
+<li>A*算法不带障碍物效果</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/05/Qnshgy3KLdFDwbf.png" srcset="/img/loading.gif" lazyload alt="image-20200805141114490"></p>
+<ul>
+<li>Dijkstra算法不带障碍物效果</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/05/4mMGoP39chwXgHL.png" srcset="/img/loading.gif" lazyload alt="image-20200805141232494"></p>
+<ul>
+<li>A*算法带障碍物效果</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/05/IDz9kOlrPN3dBa2.png" srcset="/img/loading.gif" lazyload alt="image-20200805141327151"></p>
+<ul>
+<li>Dijkstra算法带障碍物效果</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/05/RhF6Xj3D8wt7YA5.png" srcset="/img/loading.gif" lazyload alt="image-20200805141347334"></p>
+<p>两种不同算法体现到咱们racecar里具体就是：</p>
+<p>左图为Dijkstra，右图为A*</p>
+<center>
+    <img src="https://i.loli.net/2020/08/06/mfLrbjOSxXJcYtG.png" srcset="/img/loading.gif" lazyload>　　　　　<img src="https://i.loli.net/2020/08/06/qYlsKCnxNuhA3oe.png" srcset="/img/loading.gif" lazyload>
+</center>
+
+
+<h3 id="Navigation-Local-Planner"><a href="#Navigation-Local-Planner" class="headerlink" title="Navigation - Local Planner"></a>Navigation - Local Planner</h3><p>对于室内小车，ROS社区已有很多大牛们贡献了各种不同的局部规划器，总结主要有以下几种：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/base_local_planner">base_local_planner</a></li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/dwa_local_planner">DWA_local_planner</a></li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/dwb_local_planner">DWB_local_planner</a></li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/asr_ftc_local_planner">asr_ftc_local_planner</a></li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/teb_local_planner">TEB_local_planner</a></li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/eband_local_planner">Eband_local_planner</a></li>
+</ul>
+<p>比较常用的是base_local_planner、DWA_local_planner和TEB_local_planner，</p>
+<h4 id="TEB-lcoal-planner"><a href="#TEB-lcoal-planner" class="headerlink" title="TEB_lcoal_planner"></a>TEB_lcoal_planner</h4><p><code>teb_local_planner</code>实现了一个在线优化的局部轨迹规划器，用于移动机器人的导航和控制，可以作为ROS导航包的插件。</p>
+<p>由全局规划器生成的初始轨迹在运行期间进行优化，以最小化轨迹的执行时间（时间最优目标），与障碍物分离处理，满足诸如最大速度和加速度的动力学约束。</p>
+<p><code>teb_local_planner</code>的当前实现符合非完整机器人（差动驱动和类似汽车的机器人）的运动学特征。<br>（注：对地面移动机器人来说，非完整机器人指<em>X</em>—方向有速度，而<em>Y</em>-速度为0的机器人）</p>
+<p><strong>注意</strong>:<code>teb_local_planner</code>的最重要特征在于：在行进过程中调整机器人的朝向以使到达位置时的朝向是所要的朝向，因此行进过程中会有倒车（左图）。此外，它在行进过程中也不会紧密贴合路径（右图），但可以调大<em>weight_viapoint</em>和<em>global_plan_viapoint_sep</em>来调整。</p>
+<center>
+    <img src="https://i.loli.net/2020/08/05/qBbACo9VGEXkzhT.png" srcset="/img/loading.gif" lazyload width="300"><img src="https://i.loli.net/2020/08/05/1ONC4buEZQMFjrm.png" srcset="/img/loading.gif" lazyload width="300">
+</center>
+
+
+
+<h4 id="DWA-local-planner"><a href="#DWA-local-planner" class="headerlink" title="DWA_local_planner"></a>DWA_local_planner</h4><p><code>base_local_planner</code>包含有轨迹展开(Trajectory Rollout)和动态窗口方法（Dynamic Window Approach,DWA）算法。基本思想如下：</p>
+<ol>
+<li>在机器人的控制空间（dx，dy，dtheta）中进行离散采样。</li>
+<li>对于每个采样速度，从机器人的当前状态执行前向模拟，以预测如果应用采样速度在某个（短）时间段内会发生什么情况。</li>
+<li>使用包含以下特征的度量来评估（评分）由前向模拟产生的每个轨迹：接近障碍物程度，接近目标程度，接近全局路径程度和采用的速度。丢弃非法轨迹（与障碍物碰撞的轨迹）。</li>
+<li>选择得分最高的轨迹并将相关的速度发送到移动基座。</li>
+<li>清零并重复。</li>
+</ol>
+<p>DWA与“Trajectory Rollout”的不同之处在于如何对机器人的控制空间进行采样。在给定机器人的加速度极限的情况下，Trajectory Rollout在整个前向模拟周期内从可实现的速度集合中进行采样，而DWA在给定机器人的加速度极限的情况下仅针对一个模拟步骤从可实现的速度集合中进行采样。这意味着DWA是一种更有效的算法，因为它可以采样更小的空间，但是对于具有低加速度限制的机器人，可能性能不如“Trajectory Rollout”，因为DWA不会向前模拟恒定加速度。然而，在实践中，我们发现DWA和轨迹展示在我们的所有测试中都具有相同的性能，建议使用DWA来提高效率。</p>
+<p>同时dwa_local_planner包提供了一个控制器，用于驱动在所述平面上的移动基座。该控制器用于将路径规划器连接到机器人。使用地图，规划器为机器人创建从一个起点到目标位置的运动轨迹。在此过程中，计划员至少在机器人周围创建一个值函数，表示为网格图。该值函数编码遍历网格单元的成本。控制器的工作是使用此值函数来确定要发送给机器人的dx，dy，dtheta速度。</p>
+<center><img src="https://i.loli.net/2020/08/05/C2nbsNX19oGAqQe.png" srcset="/img/loading.gif" lazyload width="400"></center>
+
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/" class="category-chain-item">racecar智能车仿真</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ROS/">#ROS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>racecar仿真竞赛经验总结（六）- Navigation导航包</div>
+      <div>http://example.com/2020/08/05/racecar仿真竞赛经验总结（六）- Navigation导航包/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 5, 2020</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/06/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%83%EF%BC%89-%20Pure%20pursuit%E7%BA%AF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95/" title="racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（七）- Pure pursuit纯追踪算法</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/08/04/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89-%20TF%E6%A0%91/" title="racecar仿真竞赛经验总结（五）- TF树">
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（五）- TF树</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

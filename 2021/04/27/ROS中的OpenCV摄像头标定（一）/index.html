@@ -1,0 +1,887 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="ROS中的OpenCV摄像头标定（一）摄像头是一种非常精密的光学仪器，它对外界环境的感知是非常敏感的。由于摄像头内部和外部的一些原因，生成的物体图像常常会发生一定的畸变，例如在鱼眼摄像头，畸变是非常大的，如果直接将采集到的图像拿来进行图像处理的话，会产生很大的问题，为了避免数据源造成的误差，需要针对摄像头的参数进行标定。 对于OpenCV摄像头标定的内容提供两个不同的方法，分别是利用OpenCV例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ROS中的OpenCV摄像头标定（一）">
+<meta property="og:url" content="http://example.com/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="ROS中的OpenCV摄像头标定（一）摄像头是一种非常精密的光学仪器，它对外界环境的感知是非常敏感的。由于摄像头内部和外部的一些原因，生成的物体图像常常会发生一定的畸变，例如在鱼眼摄像头，畸变是非常大的，如果直接将采集到的图像拿来进行图像处理的话，会产生很大的问题，为了避免数据源造成的误差，需要针对摄像头的参数进行标定。 对于OpenCV摄像头标定的内容提供两个不同的方法，分别是利用OpenCV例">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/04/27/bnWJLOfU2MRwmKY.png">
+<meta property="og:image" content="https://i.loli.net/2021/04/27/rAhCDQY5wnJo82X.png">
+<meta property="og:image" content="https://i.loli.net/2021/04/27/f4pTMkWjFzSYm8G.png">
+<meta property="og:image" content="https://i.loli.net/2021/04/27/g6b8ytukIp1eOG9.png">
+<meta property="article:published_time" content="2021-04-27T19:00:07.000Z">
+<meta property="article:modified_time" content="2021-04-28T00:14:20.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="ROS">
+<meta property="article:tag" content="OpenCV">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2021/04/27/bnWJLOfU2MRwmKY.png">
+  
+  
+  <title>ROS中的OpenCV摄像头标定（一） - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ROS中的OpenCV摄像头标定（一）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-04-27 14:00" pubdate>
+          April 27, 2021 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.3k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">ROS中的OpenCV摄像头标定（一）</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="ROS中的OpenCV摄像头标定（一）"><a href="#ROS中的OpenCV摄像头标定（一）" class="headerlink" title="ROS中的OpenCV摄像头标定（一）"></a>ROS中的OpenCV摄像头标定（一）</h1><p>摄像头是一种非常精密的光学仪器，它对外界环境的感知是非常敏感的。由于摄像头内部和外部的一些原因，生成的物体图像常常会发生一定的畸变，例如在鱼眼摄像头，畸变是非常大的，如果直接将采集到的图像拿来进行图像处理的话，会产生很大的问题，为了避免数据源造成的误差，需要针对摄像头的参数进行标定。</p>
+<p>对于OpenCV摄像头标定的内容提供两个不同的方法，分别是利用OpenCV例程进行标定和利用<code>Camera Calibration</code>功能包进行标定，这篇内容讲述利用OpenCV例程进行标定，利用<code>Camera Calibration</code>进行标定的内容参考<a target="_blank" rel="noopener" href="https://zacdeng.github.io/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%BA%8C%EF%BC%89/">ROS中的OpenCV摄像头标定（二）</a></p>
+<h2 id="利用OpenCV例程进行标定"><a href="#利用OpenCV例程进行标定" class="headerlink" title="利用OpenCV例程进行标定"></a>利用OpenCV例程进行标定</h2><p>参考博客：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9a4d9f9dfedc">OpenCV摄像头标定</a></p>
+<p>本文介绍使用OpenCV自带的标定例程对单目摄像头标定的过程</p>
+<h3 id="设备说明"><a href="#设备说明" class="headerlink" title="设备说明"></a>设备说明</h3><p><strong>操作系统：</strong>Ubuntu 18.04</p>
+<p><strong>OpenCV版本：</strong> 3.2.0</p>
+<p><strong>摄像头：</strong> 640×480像素，90度广角镜头</p>
+<h3 id="（一）标定步骤"><a href="#（一）标定步骤" class="headerlink" title="（一）标定步骤"></a>（一）标定步骤</h3><h4 id="1、标定例程"><a href="#1、标定例程" class="headerlink" title="1、标定例程"></a>1、标定例程</h4><p>进入你的OpenCV安装目录，找到<code>samples/cpp/tutorial_code/calib3d/camera_calibration</code>目录，把它拷贝到一个合适的位置。（因为可能需要修改一些代码，因此不建议直接在原目录下使用。）</p>
+<h4 id="2、修改标定配置参数"><a href="#2、修改标定配置参数" class="headerlink" title="2、修改标定配置参数"></a>2、修改标定配置参数</h4><p>找到<code>camera_calibration/in_VID5.xml</code>文件，这是标定程序使用的配置文件，需要设置里面的几个参数。</p>
+<ol>
+<li><p>棋盘格的宽度和高度。</p>
+<div class="code-wrapper"><pre><code class="hljs html"><span class="hljs-comment">&lt;!-- Number of inner corners per a item row and column. (square, circle) --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">BoardSize_Width</span>&gt;</span>9<span class="hljs-tag">&lt;/<span class="hljs-name">BoardSize_Width</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">BoardSize_Height</span>&gt;</span>6<span class="hljs-tag">&lt;/<span class="hljs-name">BoardSize_Height</span>&gt;</span></code></pre></div>
+
+<p>需要特别注意的是，这里的宽度和高度是指内部交叉点的个数，而不是方形格的个数。如下图所示的棋盘格，内部交叉点的宽度是9，高度是6。请务必填写正确，否则无法标定。</p>
+<p><img src="https://i.loli.net/2021/04/27/bnWJLOfU2MRwmKY.png" srcset="/img/loading.gif" lazyload alt="image-20210427162038800"></p>
+</li>
+<li><p>每格的宽度</p>
+<p>每格的宽度应设置为实际的毫米数，该参数的实际用途尚待考证。目前看来，即使设置的不准确也无大碍。</p>
+<div class="code-wrapper"><pre><code class="hljs html"><span class="hljs-comment">&lt;!-- The size of a square in some user defined metric system (pixel, millimeter)--&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">Square_Size</span>&gt;</span>20<span class="hljs-tag">&lt;/<span class="hljs-name">Square_Size</span>&gt;</span></code></pre></div>
+</li>
+<li><p>选择输入方式</p>
+<p>例程提供了三种输入方式。不过，如果待标定的摄像头已经接入电脑，建议使用input camera方式。该方式只需要设置视频输入设备号，对于笔记本电脑来说，通常0表示笔记本自带摄像头，1表示外接摄像头。</p>
+<div class="code-wrapper"><pre><code class="hljs html">  <span class="hljs-comment">&lt;!-- The input to use for calibration. </span>
+<span class="hljs-comment">        To use an input camera -&gt; give the ID of the camera, like &quot;1&quot;</span>
+<span class="hljs-comment">        To use an input video  -&gt; give the path of the input video, like &quot;/tmp/x.avi&quot;</span>
+<span class="hljs-comment">        To use an image list   -&gt; give the path to the XML or YAML file containing the list of the images, like &quot;/tmp/circles_list.xml&quot;</span>
+<span class="hljs-comment">        --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">Input</span>&gt;</span>&quot;1&quot;<span class="hljs-tag">&lt;/<span class="hljs-name">Input</span>&gt;</span></code></pre></div>
+
+<p>如果不知道自己的设备号，可以通过下面指令查询</p>
+<div class="code-wrapper"><pre><code class="hljs shell">ls /dev</code></pre></div></li>
+</ol>
+<h4 id="3、编译"><a href="#3、编译" class="headerlink" title="3、编译"></a>3、编译</h4><p>新建<code>camera_calibration/CMakeLists.txt</code>文件，写入如下内容。</p>
+<div class="code-wrapper"><pre><code class="hljs cmake"><span class="hljs-keyword">project</span>(Camera_Calibration)
+<span class="hljs-keyword">set</span>(CMAKE_CXX_STANDARD <span class="hljs-number">11</span>)
+
+<span class="hljs-keyword">find_package</span>(OpenCV <span class="hljs-number">3.0</span> QUIET)
+<span class="hljs-keyword">if</span>(<span class="hljs-keyword">NOT</span> OpenCV_FOUND)
+    <span class="hljs-keyword">find_package</span>(OpenCV <span class="hljs-number">2.4</span>.<span class="hljs-number">3</span> QUIET)
+    <span class="hljs-keyword">if</span>(<span class="hljs-keyword">NOT</span> OpenCV_FOUND)
+        <span class="hljs-keyword">message</span>(FATAL_ERROR <span class="hljs-string">&quot;OpenCV &gt; 2.4.3 not found.&quot;</span>)
+    <span class="hljs-keyword">endif</span>()
+<span class="hljs-keyword">endif</span>()
+
+<span class="hljs-keyword">include_directories</span>(<span class="hljs-variable">$&#123;OpenCV_INCLUDE_DIR&#125;</span>)
+<span class="hljs-keyword">add_executable</span>(Camera_Calibration camera_calibration.cpp)
+<span class="hljs-keyword">target_link_libraries</span>(Camera_Calibration <span class="hljs-variable">$&#123;OpenCV_LIBS&#125;</span>)</code></pre></div>
+
+<p>编译</p>
+<div class="code-wrapper"><pre><code class="hljs shell">zacdeng@zacdeng-PC:camera_calibration/build$ cmake ..
+zacdeng@zacdeng-PC:camera_calibration/build$ make</code></pre></div>
+
+<h4 id="4、运行"><a href="#4、运行" class="headerlink" title="4、运行"></a>4、运行</h4><p>运行时需要传入配置文件：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">zacdeng@zacdeng-PC:camera_calibration/build$ ./Camera_Calibration ../in_VID5.xml</code></pre></div>
+
+<p>程序启动后会出现当前摄像头拍摄到的画面，右下角有操作提示。按下键盘’q’键开始标定。请务必使摄像头从不同方向拍摄棋盘格，以保证程序准确计算图像畸变。共拍摄25张照片后自动结束标定，标定结果写入<code>camera_calibration/out_camera_data.xml</code>。此时，为了查看标定效果，可以按下键盘’u’键，画面将切换到去畸变后的图像，如果畸变完全消除，则标定成功，否则应该重新标定。</p>
+<p>这里有一些注意事项：</p>
+<ul>
+<li>可以直接在另一台电脑屏幕上显示棋盘格，而不必打印出来。屏幕上显示的棋盘格更平整，不会引入额外的误差。</li>
+<li>要在上下左右各个角度拍摄棋盘格，以减少各个图片间的相关性，有利于求解相机参数和畸变系数。</li>
+</ul>
+<p>现在，就可以使用标定好的相机内参和畸变系数啦！</p>
+<h3 id="（二）相机去畸变"><a href="#（二）相机去畸变" class="headerlink" title="（二）相机去畸变"></a>（二）相机去畸变</h3><p>有了标定好的参数，如何把输入图片的畸变去除呢？其实很简单，只需要调用OpenCV提供的一个函数就可以了：</p>
+<div class="code-wrapper"><pre><code class="hljs python">cv2.undistort(frame,mK,mDistCoef,<span class="hljs-literal">None</span>,mK)</code></pre></div>
+
+<p>其中frame为原图片，mK为相机内参数矩阵，mDistCoef为畸变矩阵。后两个矩阵都可以在<code>camera_calibration/out_camera_data.xml</code>中找到。</p>
+<p>下面给出一个我自己使用的例程：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># -*- coding: utf-8 -*-</span>
+<span class="hljs-comment"># @Author  : Zachary Deng</span>
+<span class="hljs-comment"># @Email   : zacdeng0720@gmail.com</span>
+<span class="hljs-comment"># @Time    : 2021/4/20 12:00</span>
+<span class="hljs-comment"># @Function: OpenCV标定应用及二维码识别</span>
+
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">import</span> cv2
+<span class="hljs-keyword">import</span> pyzbar.pyzbar <span class="hljs-keyword">as</span> pyzbar
+
+mDistCoef = np.array([ -<span class="hljs-number">4.1802327018241026e-001</span>, <span class="hljs-number">5.0715243805833121e-001</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>,
+       -<span class="hljs-number">5.7843596847939704e-001</span> ])
+
+mK = np.array([ [<span class="hljs-number">6.5746697810243404e+002</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">3.1950000000000000e+002</span>],[ <span class="hljs-number">0.</span>,
+       <span class="hljs-number">6.5746697810243404e+002</span>, <span class="hljs-number">2.3950000000000000e+002</span>], [<span class="hljs-number">0.</span>, <span class="hljs-number">0.</span>, <span class="hljs-number">1.</span> ]])
+ 
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">decodeDisplay</span>(<span class="hljs-params">image</span>):
+    barcodes = pyzbar.decode(image)
+    <span class="hljs-keyword">for</span> barcode <span class="hljs-keyword">in</span> barcodes:
+        <span class="hljs-comment"># 提取二维码的边界框的位置</span>
+        <span class="hljs-comment"># 画出图像中条形码的边界框</span>
+
+        (x, y, w, h) = barcode.rect
+        cv2.rectangle(image, (x, y), (x + w, y + h), (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">255</span>), <span class="hljs-number">2</span>)
+ 
+        <span class="hljs-comment"># 提取二维码数据为字节对象，所以如果我们想在输出图像上</span>
+        <span class="hljs-comment"># 画出来，就需要先将它转换成字符串</span>
+        barcodeData = barcode.data.decode(<span class="hljs-string">&quot;utf-8&quot;</span>)
+        barcodeType = barcode.<span class="hljs-built_in">type</span>
+ 
+        <span class="hljs-comment"># 绘出图像上条形码的数据和条形码类型</span>
+        text = <span class="hljs-string">&quot;&#123;&#125; (&#123;&#125;)&quot;</span>.<span class="hljs-built_in">format</span>(barcodeData, barcodeType)
+        cv2.putText(image, text, (x, y - <span class="hljs-number">10</span>), cv2.FONT_HERSHEY_SIMPLEX,
+                    <span class="hljs-number">.5</span>, (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">125</span>), <span class="hljs-number">2</span>)
+ 
+        <span class="hljs-comment"># 向终端打印条形码数据和条形码类型</span>
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;[INFO] Found &#123;&#125; barcode: &#123;&#125;&quot;</span>.<span class="hljs-built_in">format</span>(barcodeType, barcodeData))
+    <span class="hljs-keyword">return</span> image
+ 
+ 
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">detect</span>():
+    camera = cv2.VideoCapture(<span class="hljs-number">0</span>)
+ 
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        <span class="hljs-comment"># 读取当前帧</span>
+        ret, frame = camera.read()
+        <span class="hljs-comment">#frame = cv2.imread(&quot;/home/ucar/Documents/temp/1.png&quot;)</span>
+        <span class="hljs-comment"># 转为灰度图像</span>
+        dst=cv2.undistort(frame,mK,mDistCoef,<span class="hljs-literal">None</span>,mK)
+        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+        im = decodeDisplay(gray)
+ 
+        cv2.waitKey(<span class="hljs-number">5</span>)
+        cv2.imshow(<span class="hljs-string">&quot;camera&quot;</span>, im)
+ 
+    camera.release()
+    cv2.destroyAllWindows()
+ 
+ 
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>:
+    detect()</code></pre></div>
+
+<h3 id="（三）效果展示"><a href="#（三）效果展示" class="headerlink" title="（三）效果展示"></a>（三）效果展示</h3><p>标定前：</p>
+<p><img src="https://i.loli.net/2021/04/27/rAhCDQY5wnJo82X.png" srcset="/img/loading.gif" lazyload alt="image-20210427163419209"></p>
+<p>标定后：</p>
+<p><img src="https://i.loli.net/2021/04/27/f4pTMkWjFzSYm8G.png" srcset="/img/loading.gif" lazyload alt="image-20210427163441436"></p>
+<h3 id="（四）理论知识——相机模型"><a href="#（四）理论知识——相机模型" class="headerlink" title="（四）理论知识——相机模型"></a>（四）理论知识——相机模型</h3><p>光会用还不够，我们应该至少了解为什么需要标定，标定有什么用。</p>
+<p>简单来说，标定是为了能够从空间点的像素坐标映射到世界坐标，这是3D立体视觉必须经过的过程。这一过程需要三步，第一步从畸变的像素坐标映射到去畸变的像素坐标，需要用到畸变矩阵mDistCoef；第二步从去畸变的像素坐标映射到相机坐标，需要用到相机内参数矩阵mK；第三步从相机坐标映射到世界坐标，需要用到相机外参数矩阵，也就是相机位姿变换矩阵。下图展示了第二步和第三步的过程。</p>
+<p><img src="https://i.loli.net/2021/04/27/g6b8ytukIp1eOG9.png" srcset="/img/loading.gif" lazyload alt="image-20210427163537718"></p>
+<p>更详细的内容请参考：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/29448299">机器视觉的相机标定到底是什么？</a></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/OpenCV/" class="category-chain-item">OpenCV</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ROS/">#ROS</a>
+      
+        <a href="/tags/OpenCV/">#OpenCV</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ROS中的OpenCV摄像头标定（一）</div>
+      <div>http://example.com/2021/04/27/ROS中的OpenCV摄像头标定（一）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>April 27, 2021</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/04/28/Typora%E4%BD%BF%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/" title="Typora使用说明">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Typora使用说明</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/27/ROS%E4%B8%AD%E7%9A%84OpenCV%E6%91%84%E5%83%8F%E5%A4%B4%E6%A0%87%E5%AE%9A%EF%BC%88%E4%BA%8C%EF%BC%89/" title="ROS中的OpenCV摄像头标定（二）">
+                        <span class="hidden-mobile">ROS中的OpenCV摄像头标定（二）</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

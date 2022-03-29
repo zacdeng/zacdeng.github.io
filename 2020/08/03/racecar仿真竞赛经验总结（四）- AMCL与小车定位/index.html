@@ -1,0 +1,987 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="racecar仿真竞赛经验总结（四）- AMCL与小车定位前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 由于比赛禁止使用gazebo中直接发布的小车位置坐标，只允许使用车模上有的相机、10HZ激光雷达和100HZ的IMU进行定位。为保证定位精度，博主采用rf2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="racecar仿真竞赛经验总结（四）- AMCL与小车定位">
+<meta property="og:url" content="http://example.com/2020/08/03/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%9B%9B%EF%BC%89-%20AMCL%E4%B8%8E%E5%B0%8F%E8%BD%A6%E5%AE%9A%E4%BD%8D/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="racecar仿真竞赛经验总结（四）- AMCL与小车定位前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 由于比赛禁止使用gazebo中直接发布的小车位置坐标，只允许使用车模上有的相机、10HZ激光雷达和100HZ的IMU进行定位。为保证定位精度，博主采用rf2">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/q37UknbQBlytPO9.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/XzwLkdF9QetlR1r.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/8LPASBuq2vRFyMw.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/xElAv7Y8stwQX1z.gif">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/bh4S1gk5HluOxoi.gif">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/iPthjyTXAZMK83W.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/pOjK2nJFd4rmhMx.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/P9ByWHrKDeGCRMa.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/03/nX5SCz6QaAl1ZvU.png">
+<meta property="article:published_time" content="2020-08-04T01:00:07.000Z">
+<meta property="article:modified_time" content="2020-08-04T21:05:46.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="ROS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/08/03/q37UknbQBlytPO9.png">
+  
+  
+  <title>racecar仿真竞赛经验总结（四）- AMCL与小车定位 - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="racecar仿真竞赛经验总结（四）- AMCL与小车定位"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-08-03 20:00" pubdate>
+          August 3, 2020 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          12k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          103 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">racecar仿真竞赛经验总结（四）- AMCL与小车定位</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="racecar仿真竞赛经验总结（四）-AMCL与小车定位"><a href="#racecar仿真竞赛经验总结（四）-AMCL与小车定位" class="headerlink" title="racecar仿真竞赛经验总结（四）- AMCL与小车定位"></a>racecar仿真竞赛经验总结（四）- AMCL与小车定位</h1><p>前文链接：</p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/">racecar仿真竞赛经验总结（一） - 前言</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/01/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89-%20racecar%E4%BB%BF%E7%9C%9F%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/">racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/02/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89-%20SLAM/">racecar仿真竞赛经验总结（三）- 激光SLAM建图</a></p>
+<p>由于比赛禁止使用gazebo中直接发布的小车位置坐标，只允许使用车模上有的相机、10HZ激光雷达和100HZ的IMU进行定位。为保证定位精度，博主采用rf2o_laser_odometry将小车的激光雷达数据转为能标识小车所在位置的里程计信息，同时为了提升精度，将此里程计信息通过robot_pose_ekf融合IMU数据生成更精准的里程计信息。最后搭配AMCL解决小车的定位问题。</p>
+<h2 id="rf2o-laser-odometry"><a href="#rf2o-laser-odometry" class="headerlink" title="rf2o_laser_odometry"></a>rf2o_laser_odometry</h2><p>源码包github链接：<a target="_blank" rel="noopener" href="https://github.com/MAPIRlab/rf2o_laser_odometry">rf2o_laser_odometry</a></p>
+<h3 id="算法概述"><a href="#算法概述" class="headerlink" title="算法概述"></a>算法概述</h3><p>RF2O是一种基于平面激光扫描的2D里程表估算方法。 对于没有精确里程表的移动机器人很有用。RF2O是一种快速精确的方法，可以从连续的范围扫描中估算激光雷达的平面运动。 对于每个扫描点，其根据传感器速度制定范围流量约束方程，并最小化所得几何约束的鲁棒函数以获得运动估计。 与传统方法相反，此方法不搜索对应关系，而是以密集3D视觉测距法为基础，基于扫描梯度执行密集扫描对齐。RF2O的极低计算成本（在单个CPU内核上为0.9毫秒）加上较高的精确度，使其成为那些需要平面测距的机器人应用的合适方法。</p>
+<h3 id="视频Demo"><a href="#视频Demo" class="headerlink" title="视频Demo"></a>视频Demo</h3><iframe width="560" height="315" src="https://www.youtube.com/embed/eGDoVk93otY" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<p>从激光雷达数据获得里程计信息的方法除了rf2o_laser_odometry之外，laser_scan_matcher也是一个很不错的选择！</p>
+<h3 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h3><h4 id="订阅主题-Subscribed-Topics"><a href="#订阅主题-Subscribed-Topics" class="headerlink" title="订阅主题 - Subscribed Topics"></a>订阅主题 - Subscribed Topics</h4><ul>
+<li><p><code>laser_scan</code> (<a target="_blank" rel="noopener" href="http://docs.ros.org/api/sensor_msgs/html/msg/LaserScan.html">sensor_msgs&#x2F;LaserScan</a>)D</p>
+<p>Laser scans to process. (This topic can be remapped via the ~laser_scan_topic parameter)</p>
+</li>
+<li><p><code> tf</code> (<a target="_blank" rel="noopener" href="http://docs.ros.org/api/tf/html/msg/tfMessage.html">tf&#x2F;tfMessage</a>)</p>
+<p>Transforms</p>
+</li>
+</ul>
+<h4 id="发布主题-Published-Topics"><a href="#发布主题-Published-Topics" class="headerlink" title="发布主题 - Published Topics"></a>发布主题 - Published Topics</h4><ul>
+<li><p><code>odom</code> (<a target="_blank" rel="noopener" href="http://docs.ros.org/api/nav_msgs/html/msg/Odometry.html">nav_msgs&#x2F;Odometry</a>)</p>
+<p>Odometry estimations as a ROS topic. (This topic can be remapped via the ~odom_frame_id parameter)</p>
+</li>
+<li><p><code>tf</code> (<a target="_blank" rel="noopener" href="http://docs.ros.org/api/tf/html/msg/tfMessage.html">tf&#x2F;tfMessage</a>)</p>
+<p>Publishes the transform from the \base_link (which can be remapped via the ~base_frame_id parameter) to \odom (which can be remapped via the ~odom_frame_id parameter).</p>
+</li>
+</ul>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><ul>
+<li>由于rf2o_laser_odometry包发出的&#x2F;odom主题中的pose和twist是不包含covariance的，而之后使用的robot_pose_ekf需要用到协方差矩阵，因此这里需要提供一个静止和运动时的协方差矩阵才可以正常工作，以下的协方差矩阵可供参考（使用不同的协方差矩阵对其效果有很大影响！可以自行尝试）</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-comment">#define ODOM_POSE_COVARIANCE  &#123;1e-3, 0, 0, 0, 0, 0, </span>
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, 
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, 
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>,
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e3&#125;
+
+<span class="hljs-comment">#define ODOM_POSE_COVARIANCE2 &#123;1e-9, 0, 0, 0, 0, 0, </span>
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">3</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">9</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>,
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">9</span>&#125;
+
+<span class="hljs-comment">#define ODOM_TWIST_COVARIANCE &#123;1e-3, 0, 0, 0, 0, 0, </span>
+							   <span class="hljs-attribute">0</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, 
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, 
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, 
+                               <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e3&#125;
+
+<span class="hljs-comment">#define ODOM_TWIST_COVARIANCE2 &#123;1e-9, 0, 0, 0, 0, 0,</span>
+								<span class="hljs-attribute">0</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">3</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">9</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, 
+								<span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+                                <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>,
+                                <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e6, <span class="hljs-number">0</span>,
+                                <span class="hljs-attribute">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>e-<span class="hljs-number">9</span>&#125;</code></pre></div>
+
+<p>有了协方差矩阵后只需要在特定位置将其付给odom.pose.covariance和odom.twist.covariance即可</p>
+<p><img src="https://i.loli.net/2020/08/03/q37UknbQBlytPO9.png" srcset="/img/loading.gif" lazyload alt="image-20200803173956794"></p>
+<ul>
+<li>由于rf2o_laser_odometry会发布一个tf变化，这将导致tf树发生改变，这里不需要使用可以在源码中禁止其发布</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/03/XzwLkdF9QetlR1r.png" srcset="/img/loading.gif" lazyload alt="image-20200803174131147"></p>
+<h4 id="参数调整"><a href="#参数调整" class="headerlink" title="参数调整"></a>参数调整</h4><ul>
+<li><p><code>~laser_scan_topic</code> (string, default: &#x2F;laser_scan)</p>
+<p>Topic name where lidar scans are being published.</p>
+</li>
+<li><p><code>~base_frame_id</code> (string, default: &#x2F;base_link)</p>
+<p>TF frame name of the mobile robot base. A tf transform from the laser_frame to the base_frame should exist.</p>
+</li>
+<li><p><code>~odom_frame_id</code> (string, default: &#x2F;odom)</p>
+<p>TF frame name for published odometry estimations. This same parameter is used to publish odometry as a topic.</p>
+</li>
+<li><p><code>~freq</code> (double, default: 10.0)</p>
+<p>Odometry publication rate (Hz).</p>
+</li>
+</ul>
+<h3 id="launch文件参考"><a href="#launch文件参考" class="headerlink" title="launch文件参考"></a>launch文件参考</h3><div class="code-wrapper"><pre><code class="hljs abnf">&lt;launch&gt;
+ &lt;node pkg<span class="hljs-operator">=</span><span class="hljs-string">&quot;rf2o_laser_odometry&quot;</span> type<span class="hljs-operator">=</span><span class="hljs-string">&quot;rf2o_laser_odometry_node&quot;</span> name<span class="hljs-operator">=</span><span class="hljs-string">&quot;rf2o_laser_odometry&quot;</span>&gt;
+  &lt;param name<span class="hljs-operator">=</span><span class="hljs-string">&quot;laser_scan_topic&quot;</span> value<span class="hljs-operator">=</span><span class="hljs-string">&quot;/scan&quot;</span>/&gt;
+  &lt;param name<span class="hljs-operator">=</span><span class="hljs-string">&quot;base_frame_id&quot;</span> value<span class="hljs-operator">=</span><span class="hljs-string">&quot;/base_footprint&quot;</span>/&gt;
+  &lt;param name<span class="hljs-operator">=</span><span class="hljs-string">&quot;odom_frame_id&quot;</span> value<span class="hljs-operator">=</span><span class="hljs-string">&quot;/odom&quot;</span>/&gt;
+  &lt;param name<span class="hljs-operator">=</span><span class="hljs-string">&quot;freq&quot;</span> value<span class="hljs-operator">=</span><span class="hljs-string">&quot;10.0&quot;</span>/&gt;
+ &lt;/node&gt;
+&lt;/launch&gt;</code></pre></div>
+
+<h2 id="robot-pose-ekf"><a href="#robot-pose-ekf" class="headerlink" title="robot_pose_ekf"></a>robot_pose_ekf</h2><p>ROS Wiki：<a target="_blank" rel="noopener" href="http://wiki.ros.org/robot_pose_ekf">http://wiki.ros.org/robot_pose_ekf</a></p>
+<p>源码包github链接：<a target="_blank" rel="noopener" href="https://github.com/ros-planning/navigation/tree/kinetic-devel/robot_pose_ekf">robot_pose_ekf</a></p>
+<p>创客智造教程：<a target="_blank" rel="noopener" href="https://www.ncnynl.com/archives/201708/1909.html">https://www.ncnynl.com/archives/201708/1909.html</a></p>
+<p>源码分析：<a target="_blank" rel="noopener" href="https://blog.csdn.net/zhxue_11/article/details/83828877">https://blog.csdn.net/zhxue_11/article/details/83828877</a></p>
+<p>问题整理和修改教程：<a target="_blank" rel="noopener" href="https://blog.csdn.net/shenghuaijing3314/article/details/78220151">https://blog.csdn.net/shenghuaijing3314/article/details/78220151</a></p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><a target="_blank" rel="noopener" href="https://github.com/ros-planning/navigation/tree/kinetic-devel/robot_pose_ekf">robot_pose_ekf</a>是ROS Navigation stack中的一个包，通过扩展卡尔曼滤波器对imu、里程计odom、视觉里程计vo的数据进行融合，来估计平面移动机器人的真实位置姿态，输出odom_combined消息。robot_pose_ekf只适用于平面上的轮式移动机器人，因此odom信息中的z，pitch和roll分量可以被忽略。IMU可以提供车体坐标系相对于世界坐标系的姿态（RPY角），其中Roll和Pitch是绝对角度，因为有重力方向作为参考，而偏航角Yaw则是一个相对角度（如果IMU中没有集成电子罗盘测量地球磁场角作为参考）。IMU姿态的协方差矩阵代表了姿态测量的不确定度。</p>
+<h3 id="节点-1"><a href="#节点-1" class="headerlink" title="节点"></a>节点</h3><h4 id="订阅主题-Subscribed-Topics-1"><a href="#订阅主题-Subscribed-Topics-1" class="headerlink" title="订阅主题 - Subscribed Topics"></a>订阅主题 - Subscribed Topics</h4><ul>
+<li><p><code>odom</code>（编码器）<br> (<a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://docs.ros.org/api/nav_msgs/html/msg/Odometry.html">nav_msgs&#x2F;Odometry</a>)<strong>2D pose</strong> (轮式里程计): 二维姿态包含机器人平面中的坐标和朝向以及方位协方差。平面机器人中，其中z, roll and pitch 忽略。</p>
+</li>
+<li><p><code>imu_data</code>（IMU）<br> (<a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html">sensor_msgs&#x2F;Imu</a>)<strong>3D orientation</strong> (used by the IMU): 提供包含相对世界坐标系的Roll, Pitch 和 Yaw 角度。 Roll 和 Pitch 角是绝对角度，Yaw是相对角度。协方差矩阵决定了方向的不确定性， robot pose ekf 在仅仅接收此msg时不会工作，它需要 ‘vo’ 或’odom’ 主题。</p>
+</li>
+<li><p><code>vo</code>（视觉里程计）<br> (<a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://docs.ros.org/api/nav_msgs/html/msg/Odometry.html">nav_msgs&#x2F;Odometry</a>)<strong>3D pose</strong> (used by Visual Odometry): 此主题包含机器人全方向及相应协方差信息，当传感器只测量部分3维信息时，需要制定一个较大的协方差用来忽略此项数据。</p>
+</li>
+</ul>
+<p>The robot_pose_ekf节点不需要三个主题同时有效，每个主题数据都会产生一个位置估计及协方差。主题的频率也不一定一致，也具有不同的延迟。数据间歇收发，这时节点将自动检测使用有效的传感数据。添加自主的传感数据参照GPS的示例即可。 <a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://wiki.ros.org/robot_pose_ekf/Tutorials/AddingGpsSensor">the Adding a GPS sensor tutorial</a></p>
+<h4 id="发布主题-Published-Topics-1"><a href="#发布主题-Published-Topics-1" class="headerlink" title="发布主题 - Published Topics"></a>发布主题 - Published Topics</h4><ul>
+<li><code>robot_pose_ekf/odom_combined</code> (<a target="_blank" rel="noopener" href="https://link.jianshu.com/?t=http://docs.ros.org/api/geometry_msgs/html/msg/PoseWithCovarianceStamped.html">geometry_msgs&#x2F;PoseWithCovarianceStamped</a>)<br>过滤器的输出（估计的3D机器人姿态）</li>
+</ul>
+<h4 id="TF变换"><a href="#TF变换" class="headerlink" title="TF变换"></a>TF变换</h4><ul>
+<li><code>odom_combined</code> → <code>base_footprint</code></li>
+</ul>
+<p>robot_pose_ekf在输出odom_combined信息同时还会发布相关的坐标变换，输入下面指令查看tf变换关系：</p>
+<div class="code-wrapper"><pre><code class="hljs ebnf"><span class="hljs-attribute">rosrun rqt_tf_tree rqt_tf_tree</span></code></pre></div>
+
+<p>可以看出robot_pose_ekf节点会发布base_footprint坐标系相对于odom_combined坐标系的变换：</p>
+<p><img src="https://i.loli.net/2020/08/03/8LPASBuq2vRFyMw.png" srcset="/img/loading.gif" lazyload alt="image-20200803175848822"></p>
+<h3 id="launch文件参考-1"><a href="#launch文件参考-1" class="headerlink" title="launch文件参考"></a>launch文件参考</h3><div class="code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">launch</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">node</span> <span class="hljs-attr">pkg</span>=<span class="hljs-string">&quot;robot_pose_ekf&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;robot_pose_ekf&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;robot_pose_ekf&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;output_frame&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;odom_combined&quot;</span>/&gt;</span>  #表示输出的主题：odom_combined
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;base_footprint_frame&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;base_footprint&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;freq&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;30.0&quot;</span>/&gt;</span>                   #表示发布主题的频率 30hz
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;sensor_timeout&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1.0&quot;</span>/&gt;</span>          #表示超时时间，1.0表示1秒，如果1秒内没有传感器输入，会报错。
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_used&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>              #表示里程计使能
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;imu_used&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>               #表示imu使能
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;vo_used&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;false&quot;</span>/&gt;</span>               #视觉里程计
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;debug&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;self_diagnose&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;false&quot;</span>/&gt;</span>
+    <span class="hljs-comment">&lt;!--remap from=&quot;imu_data&quot;  to =&quot;imu_data1&quot;/--&gt;</span>      #取消注释为添加滤波
+  <span class="hljs-tag">&lt;/<span class="hljs-name">node</span>&gt;</span> 
+ <span class="hljs-tag">&lt;/<span class="hljs-name">launch</span>&gt;</span></code></pre></div>
+
+<h3 id="其他注意事项"><a href="#其他注意事项" class="headerlink" title="其他注意事项"></a>其他注意事项</h3><p>robot_pose_ekf中用到的imu和odom数据都需要有协方差矩阵</p>
+<p>imu数据的协方差矩阵设置可以参考：<a target="_blank" rel="noopener" href="https://github.com/Arkapravo/turtlebot/blob/master/turtlebot_node/src/turtlebot_node/gyro.py">https://github.com/Arkapravo/turtlebot/blob/master/turtlebot_node/src/turtlebot_node/gyro.py</a> (官方提供的模型中已经设置好这里可以直接使用)</p>
+<div class="code-wrapper"><pre><code class="hljs stylus">self<span class="hljs-selector-class">.imu_data</span><span class="hljs-selector-class">.orientation_covariance</span> = <span class="hljs-selector-attr">[1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6]</span>
+self<span class="hljs-selector-class">.imu_data</span><span class="hljs-selector-class">.angular_velocity_covariance</span> = <span class="hljs-selector-attr">[1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6]</span></code></pre></div>
+
+<p>底盘运动时odom的协方差矩阵在上文rf2o_laser_odometry时已给出</p>
+<p><em>注意imu信息的协方差矩阵中代表机器人航向角的分量方差为1e-6，而里程计信息的协方差矩阵中机器人姿态分量的协方差为1e3，两个值相差很大。在进行EKF融合时，会更“相信”imu提供的姿态信息，因为其方差更小。比如机器人在转动过程中轮子发生了打滑，用编码器推算出的姿态一直在旋转，而实际姿态（主要由IMU测量得到）却没发生太大变化，这种情况就需要使用信息融合方法来减小误差。协方差矩阵中的参数设置非常重要，要根据传感器手册或者实际使用测量来确定。</em></p>
+<p>在网上看到一个博主写的很不错这里引用一下–<a target="_blank" rel="noopener" href="https://www.cnblogs.com/21207-iHome/p/8117069.html">博客链接</a></p>
+<p>下图为vrep仿真中robot_pose_ekf的效果，其中蓝色的曲线是使用robot_pose_ekf融合后的机器人运动轨，红色为原始的带噪声的轨迹曲线（这只是一个例子，实际效果怎么样还要调整各种参数）：</p>
+<p><img src="https://i.loli.net/2020/08/03/xElAv7Y8stwQX1z.gif" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>另外需要注意的是，robot_pose_ekf会发布base_link到odom的tf变换，因此我们自己的程序中就不用发布了，否则会出现冲突（在tf树中是不能构成回路的，只能有一个父坐标系，但是可以有很多子坐标系 ）。下图是仿真过程中rivz显示的原始odom（黄色箭头）和融合后的odom_combined（红色箭头）信息，以及base_link坐标系和odom坐标系间的变换关系。</p>
+<p><img src="https://i.loli.net/2020/08/03/bh4S1gk5HluOxoi.gif" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="AMCL"><a href="#AMCL" class="headerlink" title="AMCL"></a>AMCL</h2><p>ROS Wiki：<a target="_blank" rel="noopener" href="http://wiki.ros.org/amcl">amcl</a></p>
+<p>古月居教程：<a target="_blank" rel="noopener" href="https://www.guyuehome.com/273">https://www.guyuehome.com/273</a></p>
+<p>创客智造教程：<a target="_blank" rel="noopener" href="https://www.ncnynl.com/archives/201708/1911.html">https://www.ncnynl.com/archives/201708/1911.html</a></p>
+<p>参数调整——csdn：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/dyan1024/p/7825988.html">https://www.cnblogs.com/dyan1024/p/7825988.html</a></p>
+<p>其他博客链接：<a target="_blank" rel="noopener" href="https://magicalsoso.github.io/2020/02/18/TwoWheelDiffChassisSLAM10-Navigation/#amcl%E9%85%8D%E7%BD%AE">https://magicalsoso.github.io/2020/02/18/TwoWheelDiffChassisSLAM10-Navigation/#amcl%E9%85%8D%E7%BD%AE</a></p>
+<p>关于amcl的相关教程在网上很多，这里就不对其原理再展开描述了，博主主要分享一下amcl参数配置和所遇到的问题</p>
+<h3 id="amcl中包含的话题和服务"><a href="#amcl中包含的话题和服务" class="headerlink" title="amcl中包含的话题和服务"></a>amcl中包含的话题和服务</h3><p><img src="https://i.loli.net/2020/08/03/iPthjyTXAZMK83W.png" srcset="/img/loading.gif" lazyload alt="image-20200803183524490"></p>
+<h3 id="amcl参数配置"><a href="#amcl参数配置" class="headerlink" title="amcl参数配置"></a>amcl参数配置</h3><p>先上我们的amcl配置</p>
+<div class="code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">launch</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">arg</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;scan_topic&quot;</span> <span class="hljs-attr">default</span>=<span class="hljs-string">&quot;scan&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">node</span> <span class="hljs-attr">pkg</span>=<span class="hljs-string">&quot;amcl&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;amcl&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;amcl&quot;</span> <span class="hljs-attr">output</span>=<span class="hljs-string">&quot;screen&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">remap</span> <span class="hljs-attr">from</span>=<span class="hljs-string">&quot;scan&quot;</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;scan_filtered&quot;</span>/&gt;</span>
+
+        <span class="hljs-comment">&lt;!-- Overall filter parameters --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;min_particles&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;500&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;max_particles&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;2000&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;kld_err&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.05&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;kld_z&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.99&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;update_min_d&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.25&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Translational movement required before performing a filter update. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;update_min_a&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.2&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Rotational movement required before performing a filter update. 0.1 represents 5.7 degrees  --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;resample_interval&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;1&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Number of filter updates required before resampling. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;transform_tolerance&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.1&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Default 0.1; time with which to post-date the transform that is published, to indicate that this transform is valid into the future. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;recovery_alpha_slow&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.001&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Exponential decay rate for the slow average weight filter, used in deciding when to recover by adding random poses. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;recovery_alpha_fast&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.1&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Exponential decay rate for the fast average weight filter, used in deciding when to recover by adding random poses. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;gui_publish_rate&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;10.0&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Maximum rate (Hz) at which scans and paths are published for visualization, -1.0 to disable. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;save_pose_rate&quot;</span>   <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.3&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;use_map_topic&quot;</span>    <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;first_map_only&quot;</span>   <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;false&quot;</span>/&gt;</span>
+
+        <span class="hljs-comment">&lt;!-- set particles init pose to robot pose --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;initial_pose_x&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;-0.5&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- -0.5 --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;initial_pose_y&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.0&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;initial_pose_a&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.0&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;initial_cov_xx&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.09&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;initial_cov_yy&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.09&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;initial_cov_aa&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.03&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- pi/12 * pi/12 0.033--&gt;</span>
+
+        <span class="hljs-comment">&lt;!-- Laser model parameters --&gt;</span>
+	<span class="hljs-tag">&lt;<span class="hljs-name">remap</span> <span class="hljs-attr">from</span>=<span class="hljs-string">&quot;scan&quot;</span> <span class="hljs-attr">to</span>=<span class="hljs-string">&quot;$(arg scan_topic)&quot;</span>/&gt;</span>
+	    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_min_range&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;-1&quot;</span> /&gt;</span>
+	    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_max_range&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;12&quot;</span> /&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_max_beams&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;60&quot;</span>/&gt;</span>	
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_z_hit&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.5&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_z_short&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.05&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_z_max&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.05&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_z_rand&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.5&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_sigma_hit&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.2&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_lambda_short&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.1&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_likelihood_max_dist&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;2.0&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;laser_model_type&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;likelihood_field&quot;</span>/&gt;</span>
+
+        <span class="hljs-comment">&lt;!-- Odometry model parameters --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_model_type&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;diff&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_alpha1&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.2&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Specifies the expected noise in odometry&#x27;s rotation estimate from the rotational component of the robot&#x27;s motion. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_alpha2&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.2&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Specifies the expected noise in odometry&#x27;s rotation estimate from translational component of the robot&#x27;s motion. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_alpha3&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.2&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Specifies the expected noise in odometry&#x27;s translation estimate from the translational component of the robot&#x27;s motion. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_alpha4&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.2&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Specifies the expected noise in odometry&#x27;s translation estimate from the rotational component of the robot&#x27;s motion. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_alpha5&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;0.1&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!--only used if model is &quot;omni&quot;--&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;odom_frame_id&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;odom_combined&quot;</span>/&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;base_frame_id&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;base_footprint&quot;</span>/&gt;</span> <span class="hljs-comment">&lt;!-- Change this if you want to change your base frame id. --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;global_frame_id&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;map&quot;</span>/&gt;</span>
+	    <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;tf_broadcast&quot;</span>    <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">node</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">launch</span>&gt;</span></code></pre></div>
+
+<p>其中具体的参数含义请自行查阅ros wiki或者其他博客链接，博主分享一下这里面比较重要的参数</p>
+<ul>
+<li><p><code>min_particles</code>：</p>
+<p>滤波器中的最少粒子数，值越大定位效果越好，但是相应的会增加主控平台的计算资源消耗。</p>
+</li>
+<li><p><code>max_particles</code>：</p>
+<p>滤波器中最多粒子数，是一个上限值，因为太多的粒子数会导致系统资源消耗过多。</p>
+</li>
+<li><p><code>initial_pose_x</code>、<code>initial_pose_y</code>和<code>initial_pose_a</code>：</p>
+<p>初始位姿均值，用于初始化高斯分布滤波器，initial_pose_参数决定撒出去的初始位姿粒子集范围中心，这里只要把位置定在小车中心即可</p>
+</li>
+<li><p><code>initial_cov_xx</code>、<code>initial_cov_yy</code>和<code>initial_cov_aa</code>：</p>
+<p>初始位姿协方差，用于初始化高斯分布滤波器。initial_cov_参数决定初始粒子集的范围，将其调大会扩大初始化的粒子分布范围，比赛中只要将其范围扩大到赛道宽度左右大小即可</p>
+</li>
+<li><p><code>odom_alpha1~4</code>：</p>
+<p>由于小车模型为阿卡曼模型，amcl中odom_model_type设置为diff故只需前四个即可</p>
+<ul>
+<li><code>odom_alpha1</code> (<code>double</code>, default: 0.2)：指定由机器人运动部分的旋转分量估计的里程计旋转的期望噪声，默认0.2（旋转存在旋转噪声）</li>
+<li><code>odom_alpha2</code> (<code>double</code>, default: 0.2)：机器人运动部分的平移分量估计的里程计旋转的期望噪声，默认0.2（旋转中可能出现平移噪声）</li>
+<li><code>odom_alpha3</code> (<code>double</code>, default: 0.2)：机器人运动部分的平移分量估计的里程计平移的期望噪声，如果你自认为自己机器人的里程计信息比较准确那么就可以将该值设置的很小</li>
+<li><code>odom_alpha4</code> (<code>double</code>, default: 0.2)：机器人运动部分的旋转分量估计的里程计平移的期望噪声，你设置的这4个alpha值越大说明里程计的误差越大</li>
+</ul>
+</li>
+</ul>
+<h3 id="比赛中遇到的坑"><a href="#比赛中遇到的坑" class="headerlink" title="比赛中遇到的坑"></a>比赛中遇到的坑</h3><p>首先有朋友可能要问，amcl发布的主题不是有一个&#x2F;amcl_pose了吗？为什么还要使用rf2o + ekf这样的方法来定位呢？</p>
+<p>确实理论上可以使用&#x2F;amcl_pose发布的信息直接进行定位，但&#x2F;amcl_pose发布的频率太低了…根本没办法让高速移动的小车实现精准的定位，关于其频率可以使用以下代码进行查看</p>
+<div class="code-wrapper"><pre><code class="hljs bash">rostopic hz /amcl_pose</code></pre></div>
+
+<p>由于当时没有具体搞懂amcl的原理，配置完amcl的launch文件并搭建好tf树后以为已经把amcl用上了，当时的tf树变换如下：</p>
+<p><img src="https://i.loli.net/2020/08/03/pOjK2nJFd4rmhMx.png" srcset="/img/loading.gif" lazyload alt="image-20200803195009706"></p>
+<p>结果最后发现实际使用的还是laser+imu整合出的odometry，效果飘得一批，如下图所示</p>
+<p><img src="https://i.loli.net/2020/08/03/P9ByWHrKDeGCRMa.png" srcset="/img/loading.gif" lazyload alt="image-20200803192118274"></p>
+<p>其中绿色点是小车读到的下一个目标点的位置，黑色点是小车获得的自身位置，可以发现两者在拐弯时偏差很大，当时以为是amcl协方差的问题尝试了半天，也修改了robot_pose_ekf和rf2o_laser_odometry里的与yaw相关的协方差矩阵，效果都不尽人意…后来请教学长才发现tf变换压根没发布，最后是主动监听map-&gt;basefootprint的tf变换把amcl纠正偏差的效果用上在解决问题（具体代码在odom_tf_converter包里了）</p>
+<p>最后定位结果如下：</p>
+<p><img src="https://i.loli.net/2020/08/03/nX5SCz6QaAl1ZvU.png" srcset="/img/loading.gif" lazyload alt="image-20200803193322430"></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/" class="category-chain-item">racecar智能车仿真</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ROS/">#ROS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>racecar仿真竞赛经验总结（四）- AMCL与小车定位</div>
+      <div>http://example.com/2020/08/03/racecar仿真竞赛经验总结（四）- AMCL与小车定位/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 3, 2020</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/04/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89-%20TF%E6%A0%91/" title="racecar仿真竞赛经验总结（五）- TF树">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（五）- TF树</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/08/02/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89-%20SLAM/" title="racecar仿真竞赛经验总结（三）- 激光SLAM建图">
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（三）- 激光SLAM建图</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,787 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="racecar仿真竞赛经验总结（一） - 前言由于疫情原因，今年的十五届恩智浦杯智能车竞赛室外光电组（ROS组别）初赛方式改为线上 rviz + gazebo 仿真的方式，由于是首次采用这个形式进行竞赛，博主遇到了一点问题也积累了一些经验，这个博客系列主要进行一些博主自己的经验分享以及心得总结~ 因为官方要求提交源码的缘故，这里也将博主自己的源码包开源啦~ 源码包地址放在这里，如果有帮助的话希望顺">
+<meta property="og:type" content="article">
+<meta property="og:title" content="racecar仿真竞赛经验总结（一）- 前言">
+<meta property="og:url" content="http://example.com/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="racecar仿真竞赛经验总结（一） - 前言由于疫情原因，今年的十五届恩智浦杯智能车竞赛室外光电组（ROS组别）初赛方式改为线上 rviz + gazebo 仿真的方式，由于是首次采用这个形式进行竞赛，博主遇到了一点问题也积累了一些经验，这个博客系列主要进行一些博主自己的经验分享以及心得总结~ 因为官方要求提交源码的缘故，这里也将博主自己的源码包开源啦~ 源码包地址放在这里，如果有帮助的话希望顺">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/07/31/ZbFiDw5NCIAk2YE.jpg">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/iLV9qyQwCAt7oPM.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/DP2aXkxo45QL3N8.png">
+<meta property="article:published_time" content="2020-08-01T03:30:07.000Z">
+<meta property="article:modified_time" content="2020-08-04T21:05:46.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="ROS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/07/31/ZbFiDw5NCIAk2YE.jpg">
+  
+  
+  <title>racecar仿真竞赛经验总结（一）- 前言 - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="racecar仿真竞赛经验总结（一）- 前言"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-07-31 22:30" pubdate>
+          July 31, 2020 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">racecar仿真竞赛经验总结（一）- 前言</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="racecar仿真竞赛经验总结（一）-前言"><a href="#racecar仿真竞赛经验总结（一）-前言" class="headerlink" title="racecar仿真竞赛经验总结（一） - 前言"></a>racecar仿真竞赛经验总结（一） - 前言</h1><p>由于疫情原因，今年的十五届恩智浦杯智能车竞赛室外光电组（ROS组别）初赛方式改为线上 rviz + gazebo 仿真的方式，由于是首次采用这个形式进行竞赛，博主遇到了一点问题也积累了一些经验，这个博客系列主要进行一些博主自己的经验分享以及心得总结~</p>
+<p>因为官方要求提交源码的缘故，这里也将博主自己的源码包开源啦~</p>
+<p>源码包地址放在这里，如果有帮助的话希望顺手给个star~😀   <a target="_blank" rel="noopener" href="https://github.com/zacdeng/SmartCar-Competition">github传送门</a></p>
+<p>(github里README文件列出了包的使用方法和遇到的一些问题的解决方法)</p>
+<hr>
+<h2 id="系列博客"><a href="#系列博客" class="headerlink" title="系列博客"></a>系列博客</h2><ul>
+<li>racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</li>
+<li>racecar仿真竞赛经验总结（三）- Navigation导航包</li>
+<li>racecar仿真竞赛经验总结（四）- Pure pursuit纯追踪算法</li>
+<li>racecar仿真竞赛经验总结（五）- AMCL与小车定位</li>
+<li>racecar仿真竞赛经验总结（六）- TF树</li>
+</ul>
+<hr>
+<h2 id="仿真概要"><a href="#仿真概要" class="headerlink" title="仿真概要"></a>仿真概要</h2><p>博主参考的代码是基于ros组官方提供的代码包进行优化，重写了控制器和路径追踪算法（参考pure_pursuit算法：<a target="_blank" rel="noopener" href="https://github.com/Hypha-ROS/hypharos_minicar">Ackermann based on MPC</a> 以及 <a target="_blank" rel="noopener" href="https://github.com/Hypha-ROS/hypharos_racecar">Ackermann only</a>），优化了navigation导航包中的全局路径规划和局部路径规划算法（添加权重值避免遇到道路中间的障碍时反复规划路径），具体的算法以及该代码包的使用方法在github中已给出。</p>
+<h3 id="环境及功能包"><a href="#环境及功能包" class="headerlink" title="环境及功能包"></a>环境及功能包</h3><ul>
+<li>ubuntu16.04 ROS-Kinetic（ubuntu18.04 ROS-Melodic 也可以但有一些indigo版本的包无法使用，需要自行更换）</li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/rf2o_laser_odometry">rf2o_laser_odometry</a>：订阅激光雷达&#x2F;scan话题进行一级定位</li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/robot_pose_ekf">robot_pose_ekf</a>：整合rf2o和imu进行更精确的定位</li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/amcl">amcl</a>：修正定位误差，实现相对精准的定位</li>
+<li><a target="_blank" rel="noopener" href="http://wiki.ros.org/navigation">navigation</a>：实现小车自主导航和避障功能</li>
+<li>官方提供的小车模型和gazebo环境功能包</li>
+</ul>
+<h3 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h3><p>具体使用步骤参考北邮老哥的博客：<a target="_blank" rel="noopener" href="https://www.guyuehome.com/9123">智能车仿真 —— 2020室外光电创意组线上仿真赛</a></p>
+<h4 id="模型下载地址"><a href="#模型下载地址" class="headerlink" title="模型下载地址"></a>模型下载地址</h4><p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1TFBTbCeyQMuKnxemCbyNSw">https://pan.baidu.com/s/1TFBTbCeyQMuKnxemCbyNSw</a> 提取码: crm5</p>
+<h4 id="依赖安装"><a href="#依赖安装" class="headerlink" title="依赖安装"></a>依赖安装</h4><ul>
+<li>这里需要注意一些依赖的安装要到位，防止踩坑（上文博客里都有~）</li>
+</ul>
+<p>包括但不仅限于：</p>
+<ol>
+<li><code>sudo apt-get install ros-kinetic-controller-manager </code></li>
+<li><code>sudo apt-get install ros-kinetic-gazebo-ros-control </code></li>
+<li><code>sudo apt-get install ros-kinetic-effort-controllers </code></li>
+<li><code>sudo apt-get install ros-kinetic-joint-state-controller </code></li>
+<li><code>sudo apt-get install ros-kinetic-driver-base </code></li>
+<li><code>sudo apt-get install ros-kinetic-rtabmap-ros </code></li>
+<li><code>sudo apt-get install ros-kinetic-ackermann-msgs </code></li>
+<li><code>sudo apt-get install ros-kinetic-teb-local-planner</code></li>
+</ol>
+<p><strong>如果GAZEBO打开仿真出现CMD134字眼是GAZEBO版本太低的原因从7.0.0升级到7.16.0即可！！！</strong></p>
+<hr>
+<h2 id="仿真效果"><a href="#仿真效果" class="headerlink" title="仿真效果"></a>仿真效果</h2><p>这里展示一些博主自己比赛的仿真效果，主要是一些rviz和gazebo的截图给大家看一下效果</p>
+<ul>
+<li><p>开始仿真——加载gazebo地图和rviz模型，初始化amcl等相关文件：</p>
+<p><img src="https://i.loli.net/2020/07/31/ZbFiDw5NCIAk2YE.jpg" srcset="/img/loading.gif" lazyload alt="ros1"></p>
+</li>
+<li><p>仿真进行——发布目标点后小车巡线进行导航及避障：</p>
+<p><img src="https://i.loli.net/2020/08/01/iLV9qyQwCAt7oPM.png" srcset="/img/loading.gif" lazyload alt="ros3"></p>
+</li>
+<li><p>仿真结束——小车完成：<img src="https://i.loli.net/2020/08/01/DP2aXkxo45QL3N8.png" srcset="/img/loading.gif" lazyload alt="ros2"></p>
+</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/" class="category-chain-item">racecar智能车仿真</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ROS/">#ROS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>racecar仿真竞赛经验总结（一）- 前言</div>
+      <div>http://example.com/2020/07/31/racecar仿真竞赛经验总结（一）- 前言/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 31, 2020</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/01/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89-%20racecar%E4%BB%BF%E7%9C%9F%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/" title="racecar仿真竞赛经验总结（二）- racecar仿真模型介绍">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

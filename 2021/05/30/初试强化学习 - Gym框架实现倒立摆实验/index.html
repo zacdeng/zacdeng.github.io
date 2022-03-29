@@ -1,0 +1,951 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="初试强化学习 - Gym框架搭建倒立摆实验 摘要： ​    OpenAI Gym是一款用于研发和比较强化学习算法的工具包，本文主要介绍Gym仿真环境的搭建、功能和工具包的使用方法，并详细介绍其中的经典控制问题中的倒立摆（CartPole）问题。最后针对强化学习方法解决倒立摆问题给出自己的理解，并给出了相应的完整python代码示例和解释。 一些资源：  OpenAI Gym官方docs：Docu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初试强化学习 - Gym框架搭建倒立摆实验">
+<meta property="og:url" content="http://example.com/2021/05/30/%E5%88%9D%E8%AF%95%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%20-%20Gym%E6%A1%86%E6%9E%B6%E5%AE%9E%E7%8E%B0%E5%80%92%E7%AB%8B%E6%91%86%E5%AE%9E%E9%AA%8C/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="初试强化学习 - Gym框架搭建倒立摆实验 摘要： ​    OpenAI Gym是一款用于研发和比较强化学习算法的工具包，本文主要介绍Gym仿真环境的搭建、功能和工具包的使用方法，并详细介绍其中的经典控制问题中的倒立摆（CartPole）问题。最后针对强化学习方法解决倒立摆问题给出自己的理解，并给出了相应的完整python代码示例和解释。 一些资源：  OpenAI Gym官方docs：Docu">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/ALI9mtPFM7EDsTo.gif">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/7UztO3WAmRLI6SK.png">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/1lKnwVBa78thMuH.gif">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/dmx9VCpBUE5XZQe.png">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/olLXbsYJDf7kvAU.gif">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/l59o8kbvXwauOiB.gif">
+<meta property="og:image" content="https://i.loli.net/2021/05/30/p2ogPUjTzEDyMn6.gif">
+<meta property="article:published_time" content="2021-05-30T15:45:00.000Z">
+<meta property="article:modified_time" content="2021-05-30T18:23:42.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="Reinforcement Learning">
+<meta property="article:tag" content="Gym">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2021/05/30/ALI9mtPFM7EDsTo.gif">
+  
+  
+  <title>初试强化学习 - Gym框架搭建倒立摆实验 - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="初试强化学习 - Gym框架搭建倒立摆实验"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-05-30 10:45" pubdate>
+          May 30, 2021 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          50 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">初试强化学习 - Gym框架搭建倒立摆实验</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="初试强化学习-Gym框架搭建倒立摆实验"><a href="#初试强化学习-Gym框架搭建倒立摆实验" class="headerlink" title="初试强化学习 - Gym框架搭建倒立摆实验"></a>初试强化学习 - Gym框架搭建倒立摆实验</h1><p><img src="https://i.loli.net/2021/05/30/ALI9mtPFM7EDsTo.gif" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><strong>摘要：</strong></p>
+<p>​    OpenAI Gym是一款用于研发和比较强化学习算法的工具包，本文主要介绍Gym仿真环境的搭建、功能和工具包的使用方法，并详细介绍其中的经典控制问题中的倒立摆（CartPole）问题。最后针对强化学习方法解决倒立摆问题给出自己的理解，并给出了相应的完整python代码示例和解释。</p>
+<p><strong>一些资源：</strong></p>
+<ul>
+<li>OpenAI Gym官方docs：<a target="_blank" rel="noopener" href="https://gym.openai.com/docs/">Documentation</a></li>
+<li>OpenAI Gym官方提供的仿真环境：<a target="_blank" rel="noopener" href="https://gym.openai.com/envs/#classic_control">Environments</a></li>
+<li>DQN解决倒立摆问题：<a target="_blank" rel="noopener" href="https://github.com/zacdeng/Reinforcement-learning">博主自己的github仓库</a></li>
+</ul>
+<h2 id="Gym框架安装及简单demo示例"><a href="#Gym框架安装及简单demo示例" class="headerlink" title="Gym框架安装及简单demo示例"></a>Gym框架安装及简单demo示例</h2><h3 id="Anaconda环境"><a href="#Anaconda环境" class="headerlink" title="Anaconda环境"></a>Anaconda环境</h3><p>为了方便环境的管理，养成良好的习惯，强烈建议学习和使用Anaconda环境！</p>
+<p>Anaconda的安装请参考这篇文章：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/75717350">Anaconda3安装及配置</a></p>
+<h3 id="利用Anaconda新建虚拟环境"><a href="#利用Anaconda新建虚拟环境" class="headerlink" title="利用Anaconda新建虚拟环境"></a>利用Anaconda新建虚拟环境</h3><p>首先创建一个python3.6的Anaconda虚拟环境：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">conda create --name gymTest python=3.6</code></pre></div>
+
+<p>Anaconda创建虚拟环境的格式为：<code>conda create –-name</code> 你要创建的名字 <code>python=version</code>。比如我创建的虚拟环境名字为gymTest(你可以用自己的环境名）, 用jpython版本号为3.6</p>
+<p>随后激活这个环境：</p>
+<ul>
+<li><strong>Linux，OS X：</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">source activate gymTest</code></pre></div>
+
+<ul>
+<li><strong>Windows:</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">activate gymTest</code></pre></div>
+
+<p>激活环境后，你在该终端的任何操作仅会影响到该虚拟环境，对本地环境不造成影响。随后强化学习代码中可能需要用到<code>gym</code>、<code>tensorflow</code>等工具包，都只需要在该虚拟环境下安装即可。</p>
+<p>需要进一步了解Anaconda使用方法的可以参考这篇文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/fyuanfena/article/details/52080270">Anaconda常用命令大全</a></p>
+<h3 id="安装Gym"><a href="#安装Gym" class="headerlink" title="安装Gym"></a>安装Gym</h3><p>上一步已经安装并激活了一个虚拟环境<code>gymTest</code>, 在这一步要应用，首先终端<code>cd</code>到想要安装<code>gym</code>包的目录下（根据自己电脑环境选取），<code>gym</code>框架的安装非常简单：</p>
+<p><strong>step 1：</strong></p>
+<div class="code-wrapper"><pre><code class="hljs shell">git clone https://github.com/openai/gym.git</code></pre></div>
+
+<p><strong>step 2：</strong></p>
+<div class="code-wrapper"><pre><code class="hljs shell">cd gym</code></pre></div>
+
+<p><strong>step 3：</strong></p>
+<div class="code-wrapper"><pre><code class="hljs shell">pip install -e .[all]</code></pre></div>
+
+<p><strong>or just：</strong></p>
+<div class="code-wrapper"><pre><code class="hljs powershell">pip install gym</code></pre></div>
+
+<h3 id="激活一个小车倒立摆系统"><a href="#激活一个小车倒立摆系统" class="headerlink" title="激活一个小车倒立摆系统"></a>激活一个小车倒立摆系统</h3><p>为方便代码的调试和内容注释等，推荐使用<code>jupyter lab</code>或<code>jupyter notebook</code>编写代码，<code>jupyter Notebook</code>是基于网页的用于交互计算的应用程序,其可被应用于全过程计算：开发、文档编写、运行代码和展示结果。当然，直接在终端使用python也可以，下面我们在终端使用python显示一个倒立摆模型：</p>
+<div class="code-wrapper"><pre><code class="hljs python">python <span class="hljs-comment">#在虚拟环境的终端键入python</span></code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-comment">#激活python后按以下顺序分别键入代码</span>
+<span class="hljs-keyword">import</span> gym
+env = gym.make(‘CartPole-v0’)
+env.reset()
+env.render()</code></pre></div>
+
+<p>通过上面的步骤，我们可以看到一个小车倒立摆系统，如下图所示：</p>
+<p><img src="https://i.loli.net/2021/05/30/7UztO3WAmRLI6SK.png" srcset="/img/loading.gif" lazyload alt="image-20210530111403907"></p>
+<p><strong>注：</strong></p>
+<p>本文后面的内容将使用<code>jupyter notebook</code>进行代码编写和调试，当然你可以在<code>python IDE</code>中自己配置，或者跟本文一样使用<code>jupyter notebook</code>，其安装步骤如下：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">activate gymTest</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs shell">pip3 install jupyter</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs shell">jupyter notebook #启用jupyter notebook, 默认端口是http://localhost:8888, 直接网页登陆即可</code></pre></div>
+
+<p>其实在哪个环境下安装<code>jupyter</code>都无所谓，在网页端可以直接切换虚拟环境。</p>
+<p>具体的<code>jupyter notebook</code>安装和使用可以参考这篇文章：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/91365f343585">Jupyter Notebook介绍、安装及使用教程</a></p>
+<h2 id="OpenAI-Gym仿真环境介绍"><a href="#OpenAI-Gym仿真环境介绍" class="headerlink" title="OpenAI Gym仿真环境介绍"></a>OpenAI Gym仿真环境介绍</h2><p>简单来说<code>OpenAI Gym</code>提供了许多问题和环境（或游戏）的接口，而用户无需过多了解游戏的内部实现，通过简单地调用就可以用来测试和仿真。接下来以经典控制问题<code>CartPole-v0</code>为例，简单了解一下<code>Gym</code>的特点，以下代码来自<a target="_blank" rel="noopener" href="http://gym.openai.com/docs/"><em>OpenAI Gym</em>官方文档</a></p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> gym
+env = gym.make(<span class="hljs-string">&#x27;CartPole-v0&#x27;</span>)
+env.reset()
+<span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1000</span>):
+    env.render()
+    env.step(env.action_space.sample()) <span class="hljs-comment"># take a random action</span>
+env.close()</code></pre></div>
+
+<p><img src="https://i.loli.net/2021/05/30/1lKnwVBa78thMuH.gif" srcset="/img/loading.gif" lazyload alt="图片展示"></p>
+<p> 以上代码中可以看出，<em>gym</em>的核心接口是<em>Env</em>。作为统一的环境接口，<em>Env</em>包含下面几个核心方法：</p>
+<ul>
+<li>reset(self)：重置环境的状态，返回观察。</li>
+<li>step(self, action)：推进一个时间步长，返回observation, reward, done, info。</li>
+<li>render(self, mode&#x3D;‘human’, close&#x3D;False)：重绘环境的一帧。默认模式一般比较友好，如弹出一个窗口。</li>
+<li>close(self)：关闭环境，并清除内存。</li>
+</ul>
+<h3 id="Observation"><a href="#Observation" class="headerlink" title="Observation"></a>Observation</h3><p>在上面代码中使用了env.step()函数来对每一步进行仿真，在Gym中，env.step()会返回 4 个参数：</p>
+<ul>
+<li>观测 Observation (Object)：当前step执行后，环境的观测(类型为对象)。例如，从相机获取的像素点，机器人各个关节的角度或棋盘游戏当前的状态等；</li>
+<li>奖励 Reward (Float): 执行上一步动作(action)后，智能体( agent)获得的奖励(浮点类型)，不同的环境中奖励值变化范围也不相同，但是强化学习的目标就是使得总奖励值最大；</li>
+<li>完成 Done (Boolen): 表示是否需要将环境重置 env.reset。大多数情况下，当 Done 为True 时，就表明当前回合(episode)或者试验(tial)结束。例如当机器人摔倒或者掉出台面，就应当终止当前回合进行重置(reset);</li>
+<li>信息 Info (Dict): 针对调试过程的诊断信息。在标准的智体仿真评估当中不会使用到这个info，具体用到的时候再说。</li>
+</ul>
+<p>总结来说，这就是一个强化学习的基本流程，即”<em>agent-environment loop</em>“，在每个时间点上，智能体（可以认为是你写的算法）选择一个动作（<em>action</em>），环境返回上一次<em>action</em>的观测（State）和奖励（<em>Reward</em>），用图可以表示为：</p>
+<p><img src="https://i.loli.net/2021/05/30/dmx9VCpBUE5XZQe.png" srcset="/img/loading.gif" lazyload alt="image-20210530124249897"></p>
+<h3 id="Spaces"><a href="#Spaces" class="headerlink" title="Spaces"></a>Spaces</h3><p>在前面的例子中每次执行的动作(action)都是从环境动作空间中随机进行选取的<code>env.action_space.sample()</code>，在 Gym 的仿真环境中，有运动空间 <code>action_space</code> 和观测空间 <code>observation_space</code> 两个指标，程序中被定义为 Space类型，用于描述有效的运动和观测的格式和范围。下面是一个代码示例：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> gym
+env = gym.make(<span class="hljs-string">&#x27;CartPole-v0&#x27;</span>)
+<span class="hljs-built_in">print</span>(env.action_space)
+<span class="hljs-comment">#&gt; Discrete(2)</span>
+<span class="hljs-built_in">print</span>(env.observation_space)
+<span class="hljs-comment">#&gt; Box(4,)</span></code></pre></div>
+
+<p>从程序运行结果可以看出：</p>
+<ul>
+<li><code>action_space </code>是一个离散<code>Discrete</code>类型，从discrete.py源码可知，范围是一个{0,1,…,n-1} 长度为 n 的非负整数集合，在<code>CartPole-v0</code>例子中，动作空间表示为{0,1}。</li>
+<li><code>observation_space</code> 是一个<code>Box</code>类型，从box.py源码可知，表示一个 n 维的盒子，所以在上一节打印出来的observation是一个长度为 4 的数组。数组中的每个元素都具有上下界。</li>
+</ul>
+<h3 id="“CartPole-v0”模型仿真过程"><a href="#“CartPole-v0”模型仿真过程" class="headerlink" title="“CartPole-v0”模型仿真过程"></a>“CartPole-v0”模型仿真过程</h3><p>在 <em>Gym</em> 仿真中，每一次回合开始，需要先执行 <code>reset()</code> 函数，返回初始观测信息，然后根据标志位 <code>done</code> 的状态，来决定是否进行下一次回合。所以更恰当的方法是遵守 <code>done</code> 的标志，同样我们可以参考<a target="_blank" rel="noopener" href="http://gym.openai.com/docs/"><em>OpenAI Gym</em>官方文档</a>中的代码如下</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">import</span> gym
+env = gym.make(<span class="hljs-string">&#x27;CartPole-v0&#x27;</span>)
+<span class="hljs-keyword">for</span> i_episode <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">20</span>):
+    observation = env.reset()
+    <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">100</span>):
+        env.render()
+        <span class="hljs-built_in">print</span>(observation)
+        action = env.action_space.sample()
+        observation, reward, done, info = env.step(action)
+        <span class="hljs-keyword">if</span> done:
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Episode finished after &#123;&#125; timesteps&quot;</span>.<span class="hljs-built_in">format</span>(t+<span class="hljs-number">1</span>))
+            <span class="hljs-keyword">break</span>
+env.close()</code></pre></div>
+
+<p>在 <code>CartPole-v0</code> 模型中，当 <code>done</code> 为真时，表示倒立摆控制失败，此阶段 <em>episode</em> 结束。可以计算每 <em>episode</em> 的回报就是其坚持的 <em>t+1</em> 时间，坚持的越久回报越大，在上面算法中，<em>agent</em> 的行为选择是随机的，平均回报为20左右。</p>
+<h2 id="DQN算法解决倒立摆问题"><a href="#DQN算法解决倒立摆问题" class="headerlink" title="DQN算法解决倒立摆问题"></a>DQN算法解决倒立摆问题</h2><h3 id="DQN算法基础原理"><a href="#DQN算法基础原理" class="headerlink" title="DQN算法基础原理"></a>DQN算法基础原理</h3><p>DQN是强化学习的经典算法，有能力的同学可以直接从这个算法开始入手接触强化学习，DQN原理这部分内容建议看以下这系列博客，博主已经介绍得非常详细了：</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21262246">DQN（一）DQN与增强学习</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21292697">DQN（二）增强学习和MDP</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21340755">DQN（三）价值函数和Bellman方程</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21378532">DQN（四）动态规划和Q-learning</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21421729">DQN（五）深度解读DQN算法</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21547911">DQN（六）DQN的各种改进</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21609472">DQN（七）连续控制DQN算法-NAF</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/21477488">DQN（实践）150行代码实现DQN算法玩CartPole</a></p>
+<h3 id="DQN算法在倒立摆模型上的应用"><a href="#DQN算法在倒立摆模型上的应用" class="headerlink" title="DQN算法在倒立摆模型上的应用"></a>DQN算法在倒立摆模型上的应用</h3><p>博主利用 <code>jupyter notebook</code> 加上 <code>Anaconda</code> 搭建的虚拟环境，其中需要用到<code>tensorflow</code>中简单的网络进行训练，需要自行安装<code>tensorflow</code>，方法也很简单：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">activate / source activate gymTest #根据平台激活虚拟环境</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs shell">conda install tensorflow==1.14 #如果要安装指定版本的tensorflow，在后面加上==版本，如装1.14版本的</code></pre></div>
+
+<p>具体代码如下：</p>
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-string">&quot;&quot;&quot;</span>
+<span class="hljs-string">@ Author: Zachary Deng</span>
+<span class="hljs-string">@ Date: 2021/1/5</span>
+<span class="hljs-string">@ Brief: 使用 DQN 算法训练CartPole-v0</span>
+<span class="hljs-string">&quot;&quot;&quot;</span>
+
+<span class="hljs-keyword">import</span> random
+<span class="hljs-keyword">import</span> gym
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> tensorflow.keras <span class="hljs-keyword">import</span> models, layers
+
+env = gym.make(<span class="hljs-string">&#x27;CartPole-v0&#x27;</span>) <span class="hljs-comment"># 创建倒立摆模型</span>
+
+STATE_DIM, ACTION_DIM = <span class="hljs-number">4</span>, <span class="hljs-number">2</span> <span class="hljs-comment"># State 维度 4, Action 维度 2</span>
+
+model = models.Sequential([
+    layers.Dense(<span class="hljs-number">64</span>, input_dim=STATE_DIM, activation=<span class="hljs-string">&#x27;relu&#x27;</span>),
+    layers.Dense(<span class="hljs-number">20</span>, activation=<span class="hljs-string">&#x27;relu&#x27;</span>),
+    layers.Dense(ACTION_DIM, activation=<span class="hljs-string">&#x27;linear&#x27;</span>)
+]) <span class="hljs-comment"># 简单的MLP</span>
+
+model.summary()</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">generate_data_one_episode</span>():
+    <span class="hljs-string">&#x27;&#x27;&#x27;生成单次游戏的训练数据&#x27;&#x27;&#x27;</span>
+    x, y, score = [], [], <span class="hljs-number">0</span>
+    obs = env.reset()
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        action = env.action_space.sample()
+        x.append(obs)
+        y.append([<span class="hljs-number">1</span>,<span class="hljs-number">0</span>] <span class="hljs-keyword">if</span> action == <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> [<span class="hljs-number">0</span>,<span class="hljs-number">1</span>])
+        obs, reward, done, info = env.step(action)
+        score += reward
+        <span class="hljs-keyword">if</span> done:
+            <span class="hljs-keyword">break</span>
+    <span class="hljs-keyword">return</span> x, y, score
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">generate_training_data</span>(<span class="hljs-params">expected_score=<span class="hljs-number">100</span></span>):
+    <span class="hljs-string">&#x27;&#x27;&#x27;生成N次游戏的训练数据，并进行筛选，选择 &gt; 100 的数据作为训练集&#x27;&#x27;&#x27;</span>
+    data_X, data_Y, scores = [], [], []
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10000</span>):
+        x, y, score = generate_data_one_episode()
+        <span class="hljs-keyword">if</span> score &gt; expected_score:
+            data_X += x
+            data_Y += y
+            scores.append(score)
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;dataset size: &#123;&#125;, max score: &#123;&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(<span class="hljs-built_in">len</span>(data_X), <span class="hljs-built_in">max</span>(scores)))
+    <span class="hljs-keyword">return</span> np.array(data_X), np.array(data_Y)</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs python">data_X, data_Y = generate_training_data()
+model.<span class="hljs-built_in">compile</span>(loss=<span class="hljs-string">&#x27;mse&#x27;</span>, optimizer=<span class="hljs-string">&#x27;adam&#x27;</span>)
+model.fit(data_X, data_Y, epochs=<span class="hljs-number">5</span>)
+model.save(<span class="hljs-string">&#x27;CartPole-v0-nn.h5&#x27;</span>)</code></pre></div>
+
+<div class="code-wrapper"><pre><code class="hljs python">saved_model = models.load_model(<span class="hljs-string">&#x27;CartPole-v0-nn.h5&#x27;</span>)  <span class="hljs-comment"># 加载模型</span>
+env = gym.make(<span class="hljs-string">&quot;CartPole-v0&quot;</span>)  <span class="hljs-comment"># 加载游戏环境</span>
+
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">5</span>):
+    obs = env.reset()
+    score = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        time.sleep(<span class="hljs-number">0.01</span>)
+        env.render()   <span class="hljs-comment"># 显示画面</span>
+        action = np.argmax(saved_model.predict(np.array([obs]))[<span class="hljs-number">0</span>])  <span class="hljs-comment"># 预测动作</span>
+        obs, reward, done, info = env.step(action)  <span class="hljs-comment"># 执行这个动作</span>
+        score += reward     <span class="hljs-comment"># 每回合的得分</span>
+        <span class="hljs-keyword">if</span> done:       <span class="hljs-comment"># 游戏结束</span>
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">&#x27;using nn, score: &#x27;</span>, score)  <span class="hljs-comment"># 打印分数</span>
+            <span class="hljs-keyword">break</span>
+env.close()</code></pre></div>
+
+<p>最终的训练效果展示：</p>
+<p><img src="https://i.loli.net/2021/05/30/olLXbsYJDf7kvAU.gif" srcset="/img/loading.gif" lazyload alt="倒立摆_after training"></p>
+<p>其实不只是DQN算法，PPO、A2C、A3C等算法在倒立摆这种简单得仿真环境下效果都很不错，可以利用倒立摆模型进行算法的学习，当然也可以选择动作和状态空间更为复杂的环境进行测试，这里给一些demo，可以参考<a target="_blank" rel="noopener" href="https://github.com/zacdeng/Reinforcement-learning">博主的github仓库</a></p>
+<p><img src="https://i.loli.net/2021/05/30/l59o8kbvXwauOiB.gif" srcset="/img/loading.gif" lazyload alt="202105301"></p>
+<p>当然也有相对复杂一点的仿真环境，比如机械臂和机械手：</p>
+<p><img src="https://i.loli.net/2021/05/30/p2ogPUjTzEDyMn6.gif" srcset="/img/loading.gif" lazyload alt="202105302"></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Reinforcement-Learning/" class="category-chain-item">Reinforcement Learning</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Reinforcement-Learning/">#Reinforcement Learning</a>
+      
+        <a href="/tags/Gym/">#Gym</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>初试强化学习 - Gym框架搭建倒立摆实验</div>
+      <div>http://example.com/2021/05/30/初试强化学习 - Gym框架实现倒立摆实验/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>May 30, 2021</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/07/10/MySQL%20-%20%E5%9F%BA%E7%A1%80%E7%94%A8%E6%B3%95%E6%80%BB%E7%BB%93/" title="MySQL - 基础用法总结">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">MySQL - 基础用法总结</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/28/Typora%E4%BD%BF%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE/" title="Typora使用说明">
+                        <span class="hidden-mobile">Typora使用说明</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

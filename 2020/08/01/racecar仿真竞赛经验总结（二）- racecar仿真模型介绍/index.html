@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="racecar仿真竞赛经验总结（二）- racecar仿真模型介绍上篇博客链接：racecar仿真竞赛经验总结（一） - 前言 模型搭建在上篇博客的依赖安装完全的基础上： 直接使用github上搭建好的模型 访问racecar_github仓库并下载相应功能包 新建一个workspace，并将&#x2F;src移动到该工作空间下 在当前工作空间中右键打开终端，输入以下命令编译：  catkin_m">
+<meta property="og:type" content="article">
+<meta property="og:title" content="racecar仿真竞赛经验总结（二）- racecar仿真模型介绍">
+<meta property="og:url" content="http://example.com/2020/08/01/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89-%20racecar%E4%BB%BF%E7%9C%9F%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="racecar仿真竞赛经验总结（二）- racecar仿真模型介绍上篇博客链接：racecar仿真竞赛经验总结（一） - 前言 模型搭建在上篇博客的依赖安装完全的基础上： 直接使用github上搭建好的模型 访问racecar_github仓库并下载相应功能包 新建一个workspace，并将&#x2F;src移动到该工作空间下 在当前工作空间中右键打开终端，输入以下命令编译：  catkin_m">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/KPbABGuqRQMIFY8.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/zM7V5orFsGWn92K.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/quAswkVPjOedGTF.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/G9uwtY67RVaIlfi.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/mNXDZenYbd6IAMg.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/2XIiSQWYChnlHqD.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/BJROox2tknEDTuw.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/zyO3qrLlt1jCY8d.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/qozBP9WMGlkTO3F.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/01/5KUsHnN8koJP6Rp.png">
+<meta property="article:published_time" content="2020-08-02T00:30:07.000Z">
+<meta property="article:modified_time" content="2020-08-04T21:05:54.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="ROS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/08/01/KPbABGuqRQMIFY8.png">
+  
+  
+  <title>racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="racecar仿真竞赛经验总结（二）- racecar仿真模型介绍"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-08-01 19:30" pubdate>
+          August 1, 2020 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.8k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          15 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="racecar仿真竞赛经验总结（二）-racecar仿真模型介绍"><a href="#racecar仿真竞赛经验总结（二）-racecar仿真模型介绍" class="headerlink" title="racecar仿真竞赛经验总结（二）- racecar仿真模型介绍"></a>racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</h1><p>上篇博客链接：<a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/">racecar仿真竞赛经验总结（一） - 前言</a></p>
+<h2 id="模型搭建"><a href="#模型搭建" class="headerlink" title="模型搭建"></a>模型搭建</h2><p>在上篇博客的依赖安装完全的基础上：</p>
+<h3 id="直接使用github上搭建好的模型"><a href="#直接使用github上搭建好的模型" class="headerlink" title="直接使用github上搭建好的模型"></a>直接使用github上搭建好的模型</h3><ul>
+<li>访问<a target="_blank" rel="noopener" href="https://github.com/zacdeng/SmartCar-Competition">racecar_github</a>仓库并下载相应功能包</li>
+<li>新建一个workspace，并将&#x2F;src移动到该工作空间下</li>
+<li>在当前工作空间中右键打开终端，输入以下命令编译：</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs ebnf"><span class="hljs-attribute">catkin_make</span></code></pre></div>
+
+<ul>
+<li>建议直接将工作路径添加到系统总bashrc文件中，用以下命令可以进行编辑</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs bash">gedit ~/.bashrc</code></pre></div>
+
+<p>在最后添加 source + 工作空间路径 即可，这样每次roslaunch就可以自动source，如果不添加需要在每次打开工作空间时在终端输入 source devel&#x2F;setup.bash 进行手动source（一定要在总目录下）</p>
+<p><strong>由于该模型用到了robot_pose_ekf，odom_tf_converter，rf2o_laser_odometry三个额外功能包，可能需要安装一些其他依赖，根据cmake提示进行安装即可（melodic版本可能会遇到一些问题无法正常使用，建议还是使用kinetic）</strong></p>
+<p>鉴于博主开源代码中的模型已搭建完成，进行到这一步就可以直接使用launch文件启动了，这里简要介绍一些常用功能的启动，具体的使用方法在github中已详细说明</p>
+<ul>
+<li>启动rviz和gazebo查看小车结构以及初始地图</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs applescript">roslaunch racecar_gazbeo racecar_rviz.<span class="hljs-built_in">launch</span></code></pre></div>
+
+<ul>
+<li>启动键盘控制节点</li>
+</ul>
+<p>由于博主将这个node编写到racecar.launch文件中了，这里找到racecar.launch文件中的节点控制取消注释后重新使用上面的roslaunch，在打开的gazebo环境中就可以使用键盘控制小车运动</p>
+<p><img src="https://i.loli.net/2020/08/01/KPbABGuqRQMIFY8.png" srcset="/img/loading.gif" lazyload alt="image-20200801215552429"></p>
+<h3 id="重新搭建模型"><a href="#重新搭建模型" class="headerlink" title="重新搭建模型"></a>重新搭建模型</h3><p>为了方便入门，这里建议直接使用北邮老哥提供的<a target="_blank" rel="noopener" href="https://github.com/xmy0916/racecar">racecar_demo</a></p>
+<ul>
+<li>创建新的工作空间</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> -p smartcar_ws/src</code></pre></div>
+
+<ul>
+<li>初始化工作空间</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs arcade">cd ~<span class="hljs-regexp">/smartcar_ws/</span>src
+catkin_init_workspace</code></pre></div>
+
+<p>然后导入仿真文件，将百度云下载的压缩文件解压，将其中的racecar_description.7z文件复制到smartcar_ws&#x2F;src下并提取（如下图）：</p>
+<p><img src="https://i.loli.net/2020/08/01/zM7V5orFsGWn92K.png" srcset="/img/loading.gif" lazyload alt="image-20200801223218118"></p>
+<p>将压缩文件中的smartcar_plane.7z文件提取到.gazebo下的models下，具体操作如下：</p>
+<ul>
+<li>在home目录下ctrl + h显示隐藏文件</li>
+<li>找到.gazebo文件</li>
+<li>进入文件中的models文件夹（如果没有就自己创建一个）</li>
+<li>将smartcar_plane.7z解压到models下</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/01/quAswkVPjOedGTF.png" srcset="/img/loading.gif" lazyload alt="image-20200801223555985"></p>
+<p><img src="https://i.loli.net/2020/08/01/G9uwtY67RVaIlfi.png" srcset="/img/loading.gif" lazyload alt="image-20200801223608474"></p>
+<ul>
+<li>在racecar_description文件夹下创建worlds文件夹，然后把百度网盘的world文件放到下面：</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/01/mNXDZenYbd6IAMg.png" srcset="/img/loading.gif" lazyload alt="image-20200801223642163"></p>
+<ul>
+<li>修改一下launch文件夹中的racecar.launch文件:</li>
+</ul>
+<p><img src="https://i.loli.net/2020/08/01/2XIiSQWYChnlHqD.png" srcset="/img/loading.gif" lazyload alt="image-20200801223756961"></p>
+<ul>
+<li>编译工程：</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/smartcar_ws
+catkin_make</code></pre></div>
+
+<ul>
+<li>使能环境变量：</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;source ~/smartcar_ws/devel/setup.bash&quot;</span> &gt;&gt; ~/.bashrc
+<span class="hljs-built_in">source</span> ~/.bashrc</code></pre></div>
+
+<ul>
+<li>启动仿真环境：</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs applescript">roslaunch racecar_description racecar.<span class="hljs-built_in">launch</span></code></pre></div>
+
+<p><img src="https://i.loli.net/2020/08/01/BJROox2tknEDTuw.png" srcset="/img/loading.gif" lazyload alt="image-20200801223934398"></p>
+<ul>
+<li>启动rviz和gazebo：</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs applescript">roslaunch racecar_description racecar_rviz.<span class="hljs-built_in">launch</span></code></pre></div>
+
+<p><img src="https://i.loli.net/2020/08/01/zyO3qrLlt1jCY8d.png" srcset="/img/loading.gif" lazyload alt="image-20200801224012014"></p>
+<h4 id="关于运动控制的配置"><a href="#关于运动控制的配置" class="headerlink" title="关于运动控制的配置"></a>关于运动控制的配置</h4><p>官方提供的车模已经配置好了关节，要做的就是写关节的控制器，关节控制器代码在racecar_control&#x2F;config&#x2F;racecar_control.yaml文件中，内容如下：</p>
+<p><img src="https://i.loli.net/2020/08/01/qozBP9WMGlkTO3F.png" srcset="/img/loading.gif" lazyload alt="image-20200801224518936"></p>
+<p>其中Velocity Controllers部分控制转速的pid以及关节定义，Position Controllers部分配置转向关节的pid以及关节定义，对照官方的车模（文件路径在~&#x2F;urdf&#x2F;racecar.urdf.xacro下）修改对应的关节名字就行，也可以根据launch文件修改相应关节名：</p>
+<p><img src="https://i.loli.net/2020/08/01/5KUsHnN8koJP6Rp.png" srcset="/img/loading.gif" lazyload alt="image-20200801224842229"></p>
+<p><em>在&lt;！–load the controllers–&gt;中指明了各个关节名，对应进行修改就行，有问题也可以参考github中&#x2F;src文件下已修改的文件就行</em></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/" class="category-chain-item">racecar智能车仿真</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ROS/">#ROS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</div>
+      <div>http://example.com/2020/08/01/racecar仿真竞赛经验总结（二）- racecar仿真模型介绍/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 1, 2020</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/02/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89-%20SLAM/" title="racecar仿真竞赛经验总结（三）- 激光SLAM建图">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（三）- 激光SLAM建图</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/" title="racecar仿真竞赛经验总结（一）- 前言">
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（一）- 前言</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

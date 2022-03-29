@@ -1,0 +1,872 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="racecar仿真竞赛经验总结（五）- TF树前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 racecar仿真竞赛经验总结（四）- AMCL与小车定位 关于机器人TF变换的原理和解析网上有许多优质博文，后面会附上相应链接，这里博主就不再多做赘述了，这篇博文的内">
+<meta property="og:type" content="article">
+<meta property="og:title" content="racecar仿真竞赛经验总结（五）- TF树">
+<meta property="og:url" content="http://example.com/2020/08/04/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%94%EF%BC%89-%20TF%E6%A0%91/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="racecar仿真竞赛经验总结（五）- TF树前文链接： racecar仿真竞赛经验总结（一） - 前言 racecar仿真竞赛经验总结（二）- racecar仿真模型介绍 racecar仿真竞赛经验总结（三）- 激光SLAM建图 racecar仿真竞赛经验总结（四）- AMCL与小车定位 关于机器人TF变换的原理和解析网上有许多优质博文，后面会附上相应链接，这里博主就不再多做赘述了，这篇博文的内">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/ZSqLkhYnMQwBK9V.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/Zi1lajcQJkLpvwG.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/RwIzZPLFjyvdgGW.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/7yMTzXxEsupihBb.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/gPkFVApqMl1S9zy.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/5Pfgz9FVD2dbruo.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/04/QX2W5Etz9CO3e7m.png">
+<meta property="article:published_time" content="2020-08-04T21:00:07.000Z">
+<meta property="article:modified_time" content="2020-08-04T21:05:46.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="ROS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/08/04/ZSqLkhYnMQwBK9V.png">
+  
+  
+  <title>racecar仿真竞赛经验总结（五）- TF树 - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="racecar仿真竞赛经验总结（五）- TF树"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-08-04 16:00" pubdate>
+          August 4, 2020 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.7k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">racecar仿真竞赛经验总结（五）- TF树</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="racecar仿真竞赛经验总结（五）-TF树"><a href="#racecar仿真竞赛经验总结（五）-TF树" class="headerlink" title="racecar仿真竞赛经验总结（五）- TF树"></a>racecar仿真竞赛经验总结（五）- TF树</h1><p>前文链接：</p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/07/31/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%80%EF%BC%89-%20%E5%89%8D%E8%A8%80/">racecar仿真竞赛经验总结（一） - 前言</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/01/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%BA%8C%EF%BC%89-%20racecar%E4%BB%BF%E7%9C%9F%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/">racecar仿真竞赛经验总结（二）- racecar仿真模型介绍</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/02/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E4%B8%89%EF%BC%89-%20SLAM/">racecar仿真竞赛经验总结（三）- 激光SLAM建图</a></p>
+<p><a target="_blank" rel="noopener" href="https://zacdeng.github.io/2020/08/03/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%9B%9B%EF%BC%89-%20AMCL%E4%B8%8E%E5%B0%8F%E8%BD%A6%E5%AE%9A%E4%BD%8D/">racecar仿真竞赛经验总结（四）- AMCL与小车定位</a></p>
+<p>关于机器人TF变换的原理和解析网上有许多优质博文，后面会附上相应链接，这里博主就不再多做赘述了，这篇博文的内容主要围绕racecar竞速小车中涉及的一些比较重要的内容和踩过的一些坑</p>
+<h2 id="博文推荐"><a href="#博文推荐" class="headerlink" title="博文推荐"></a>博文推荐</h2><p>这里仅列出一些博主学习过程中参考过的博文，大体上能把东西讲明白，建议学习时先看ROS Wiki上的讲解，在实际过程中遇到问题时针对问题查询资料</p>
+<h3 id="官方教程"><a href="#官方教程" class="headerlink" title="官方教程"></a>官方教程</h3><p>ROS Wiki上的tf官方教程：</p>
+<p><a target="_blank" rel="noopener" href="http://wiki.ros.org/tf/Tutorials">http://wiki.ros.org/tf/Tutorials</a></p>
+<p><a target="_blank" rel="noopener" href="http://wiki.ros.org/tf">http://wiki.ros.org/tf</a></p>
+<h3 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h3><p>ROS坐标系统：<a target="_blank" rel="noopener" href="http://community.bwbot.org/topic/227/ros%E5%9D%90%E6%A0%87%E7%B3%BB%E7%BB%9F-%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9D%90%E6%A0%87%E7%B3%BB%E5%92%8C%E5%85%B6%E5%90%AB%E4%B9%89">蓝鲸ROS机器人论坛</a></p>
+<p>ROS坐标转换讲解：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/935e0e954026">https://www.jianshu.com/p/935e0e954026</a></p>
+<h3 id="实用讲解"><a href="#实用讲解" class="headerlink" title="实用讲解"></a>实用讲解</h3><p>关于tf的监听和发布：<a target="_blank" rel="noopener" href="https://blog.csdn.net/Start_From_Scratch/article/details/50762293">https://blog.csdn.net/Start_From_Scratch/article/details/50762293</a></p>
+<p>ubuntu小乌龟实例分析：<a target="_blank" rel="noopener" href="https://blog.csdn.net/hcx25909/article/details/9255001">https://blog.csdn.net/hcx25909/article/details/9255001</a></p>
+<p>古月居-设置机器人tf：<a target="_blank" rel="noopener" href="https://www.guyuehome.com/355">https://www.guyuehome.com/355</a></p>
+<h2 id="tf工具"><a href="#tf工具" class="headerlink" title="tf工具"></a>tf工具</h2><p>利用一些tf工具能够获知一些坐标系的关系情况<br>1、<code>view_frames</code>能够监听当前时刻所有通过ROS广播的tf坐标系，并绘制出树状图表示坐标系之间的连接关系保存到离线文件中：</p>
+<div class="code-wrapper"><pre><code class="hljs ebnf"><span class="hljs-attribute">rosrun tf view_frames</span></code></pre></div>
+
+<p>2、<code>rqt_tf_tree</code>工具<br>虽然view_frames能够将当前坐标系关系保存在离线文件中，但是无法实时反映坐标关系，所以可以用rqt_tf_tree实时刷新显示坐标系关系：</p>
+<div class="code-wrapper"><pre><code class="hljs ebnf"><span class="hljs-attribute">rosrun rqt_tf_tree rqt_tf_tree</span></code></pre></div>
+
+<p>直接在终端中显示不同坐标系之间的关系：</p>
+<div class="code-wrapper"><pre><code class="hljs css">rosrun tf tf_echo <span class="hljs-selector-attr">[reference_frame]</span> <span class="hljs-selector-attr">[target_frame]</span></code></pre></div>
+
+<p>3、<code>tf_echo</code>工具<br>使用tf_echo工具可以查看两个广播参考系之间的关系。</p>
+<div class="code-wrapper"><pre><code class="hljs jboss-cli">rosrun tf tf_<span class="hljs-keyword">echo</span> turtle1 turtle2</code></pre></div>
+
+<h2 id="racecar中的tf"><a href="#racecar中的tf" class="headerlink" title="racecar中的tf"></a>racecar中的tf</h2><h3 id="竞速小车中的tf简单阐述"><a href="#竞速小车中的tf简单阐述" class="headerlink" title="竞速小车中的tf简单阐述"></a>竞速小车中的tf简单阐述</h3><p>​    ROS中的很多软件包都需要机器人发布tf变换树，那么什么是tf变换树呢？抽象的来讲，一棵tf变换树定义了不同坐标系之间的平移与旋转变换关系。具体来说，我们假设有一个机器人，包括一个机器人移动平台和一个安装在平台之上的激光雷达，以这个机器人为例，定义两个坐标系，一个坐标系以机器人移动平台的中心为原点，称为base_link参考系，另一个坐标系以激光雷达的中心为原点，称为base_laser参考系</p>
+<p><img src="https://i.loli.net/2020/08/04/ZSqLkhYnMQwBK9V.png" srcset="/img/loading.gif" lazyload alt="image-20200804113141687"></p>
+<p>​    单拿激光雷达和小车模型之间的tf变换来说：假设在机器人运行过程中，激光雷达可以采集到距离前方障碍物的数据，这些数据当然是以激光雷达为原点的测量值，换句话说，也就是base_laser参考系下的测量值。现在，如果我们想使用这些数据帮助机器人完成避障功能，当然，由于激光雷达在机器人之上，直接使用这些数据不会产生太大的问题，但是激光雷达并不在机器人的中心之上，在极度要求较高的系统中，会始终存在一个雷达与机器人中心的偏差值。这个时候，如果我们采用一种坐标变换，将及激光数据从base_laser参考系变换到base_link参考下，问题不就解决了么。这里我们就需要定义这两个坐标系之间的变换关系。</p>
+<p>​    当然上述假设只列出了激光雷达和小车之间的坐标系差异，如果是一个复杂的系统呢？比如racecar小车中的四个车轮、电池模块以及车上搭载的摄像头和imu等外设都需要一个相应的坐标变换（如下图所示），那这个工程就比较繁琐了，ROS中的tf包就是为这类问题准备的。</p>
+<center><img src="https://i.loli.net/2020/08/04/Zi1lajcQJkLpvwG.png" srcset="/img/loading.gif" lazyload width="400"/></center>
+
+<h3 id="小车中涉及的tf变换简要分析"><a href="#小车中涉及的tf变换简要分析" class="headerlink" title="小车中涉及的tf变换简要分析"></a>小车中涉及的tf变换简要分析</h3><p>​    首先我们使用rqt_tf_tree查看整个racecar的tf树结构，结果如下：</p>
+<p><img src="https://i.loli.net/2020/08/04/RwIzZPLFjyvdgGW.png" srcset="/img/loading.gif" lazyload alt="image-20200803195009706"></p>
+<p>​    可以直观的发现小车的tf树总架构并不是常见的map-&gt;odom-&gt;base_link的结构，而是map-&gt;odom_combined-&gt;base_footprint-&gt;base_link。其中odom环节被我们替换为了odom_combined，也就是ekf融合后的里程计坐标系。而odom-&gt;base_link之间又添加了一层base_footprint，其实base_footprint和base_link大体上可以认为是差不多的，只不过base_footprint可以认为是base_link消除z轴后小车投影的坐标系，其总架构还是和常见的小车tf树结构相似。常见的小车tf树结构应该如下图所示：</p>
+<p><img src="https://i.loli.net/2020/08/04/7yMTzXxEsupihBb.png" srcset="/img/loading.gif" lazyload alt="image-20200804114350145"></p>
+<hr>
+<ul>
+<li><p>base_link和base_footprint的区别</p>
+<ul>
+<li><p>base_link</p>
+<p>与机器人中心重合，坐标系原点一般为机器人的旋转中心</p>
+</li>
+<li><p>base_footprint</p>
+<p>原点为<code>base_link</code>原点在地面的投影，有些许区别（z值不同）</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>​    首先我们来看base_footprint及其底下的tf树结构，这一部分内容是官方封装好发给我们的材料，其中已经搭建好了小车机身各部分之间的tf变换且不允许更改，这一部分内容可以通过使用racecar_rviz.launch文件打开小车的rviz模型并观察其中的tf变换</p>
+<div class="code-wrapper"><pre><code class="hljs applescript">roslaunch racecar_gazebo racecar_rviz.<span class="hljs-built_in">launch</span></code></pre></div>
+
+<p>​    留给我们的主要工作也是最重要的工作是完成map-&gt;odom_combined-&gt;base_footprint之间的tf变换，其中map-&gt;odom_combined之间的tf变换通过amcl发布，odom_combined-&gt;base_footprint之间的tf变换通过robot_pose_ekf发布</p>
+<ul>
+<li><p>map-&gt;odom_combined</p>
+<p>amcl原函数里已经编写了了tf发布的相关代码，通过设置amcl.launch文件中的接口可以自动完成tf的变换</p>
+<p><img src="https://i.loli.net/2020/08/04/gPkFVApqMl1S9zy.png" srcset="/img/loading.gif" lazyload alt="image-20200804152621688"></p>
+<p>到这里amcl的tf树看上去已经没有问题了，但是！！！仅发布这样的tf变换只能显示一下机器人的位姿（in rviz），我们想要实现的利用amcl矫正定位的功能其实并未用上，博主也是在这个地方踩了坑，我们先来看看amcl到底是怎么实现定位矫正功能的</p>
+<p><img src="https://i.loli.net/2020/08/04/5Pfgz9FVD2dbruo.png" srcset="/img/loading.gif" lazyload alt="image-20200804154014219"></p>
+<p>通过原理图不难发现amcl是矫正&#x2F;map_frame-&gt;&#x2F;base_frame之间的偏差，如果不主动监听的话是没办法实现其矫正功能的，结果就是小车始终带着一个偏移量在跑，还傻乎乎的以为自己的位置是正确的（惨状可以参考上一篇博客）</p>
+<p>实现方法也很简单，主动监听后再发布就可以了：</p>
+<div class="code-wrapper"><pre><code class="hljs arduino"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;nav_msgs/Odometry.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;ros/ros.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;std_msgs/String.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;tf/transform_listener.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span>** argv)</span></span>
+<span class="hljs-function"></span>&#123;
+  ros::<span class="hljs-built_in">init</span>(argc, argv, <span class="hljs-string">&quot;tf_to_odom_converter&quot;</span>);
+  std::string source_frame_id, target_frame_id, odom_frame_id;
+
+  ros::NodeHandle node;
+  <span class="hljs-function">ros::NodeHandle <span class="hljs-title">priv_node</span><span class="hljs-params">(<span class="hljs-string">&quot;~&quot;</span>)</span></span>;
+  <span class="hljs-comment">// priv_node.param&lt;std::string&gt;(&quot;odom_frame&quot;, odom_frame_id, &quot;odom&quot;);</span>
+  <span class="hljs-comment">// priv_node.param&lt;std::string&gt;(&quot;source_frame&quot;, source_frame_id, &quot;/base_footprint&quot;);</span>
+  <span class="hljs-comment">// priv_node.param&lt;std::string&gt;(&quot;target_frame&quot;, target_frame_id, &quot;/odom_combined&quot;);</span>
+
+  ros::Publisher odom_pub = node.<span class="hljs-built_in">advertise</span>&lt;nav_msgs::Odometry&gt;(<span class="hljs-string">&quot;odom111&quot;</span>, <span class="hljs-number">1</span>);
+
+  tf::TransformListener listener;
+
+  <span class="hljs-function">ros::Rate <span class="hljs-title">rate</span><span class="hljs-params">(<span class="hljs-number">25.0</span>)</span></span>;
+  <span class="hljs-keyword">while</span> (node.<span class="hljs-built_in">ok</span>())
+  &#123;
+    tf::StampedTransform transform;
+    <span class="hljs-keyword">try</span>
+    &#123;
+      listener.<span class="hljs-built_in">waitForTransform</span>(<span class="hljs-string">&quot;map&quot;</span>, <span class="hljs-string">&quot;base_footprint&quot;</span>, ros::<span class="hljs-built_in">Time</span>(<span class="hljs-number">0</span>), ros::<span class="hljs-built_in">Duration</span>(<span class="hljs-number">20.0</span>));
+      <span class="hljs-comment">// ros::Time::now()</span>
+      listener.<span class="hljs-built_in">lookupTransform</span>(<span class="hljs-string">&quot;map&quot;</span>, <span class="hljs-string">&quot;base_footprint&quot;</span>, ros::<span class="hljs-built_in">Time</span>(<span class="hljs-number">0</span>), transform);
+    &#125;
+    <span class="hljs-built_in">catch</span> (tf::TransformException ex)
+    &#123;
+      <span class="hljs-built_in">ROS_ERROR</span>(<span class="hljs-string">&quot;%s&quot;</span>, ex.<span class="hljs-built_in">what</span>());
+    &#125;
+
+    nav_msgs::Odometry odom;
+    <span class="hljs-comment">// copy pose to odom msg</span>
+    odom.header.stamp = transform.stamp_;
+    odom.header.frame_id = <span class="hljs-string">&quot;map&quot;</span>;
+    odom.child_frame_id = <span class="hljs-string">&quot;base_footprint&quot;</span>;
+    geometry_msgs::TransformStamped ts_msg;
+    tf::<span class="hljs-built_in">transformStampedTFToMsg</span>(transform, ts_msg);
+    odom.pose.pose.position.x = ts_msg.transform.translation.x;
+    odom.pose.pose.position.y = ts_msg.transform.translation.y;
+    odom.pose.pose.position.z = ts_msg.transform.translation.z;
+    odom.pose.pose.orientation = ts_msg.transform.rotation;
+
+    odom_pub.<span class="hljs-built_in">publish</span>(odom);
+    rate.<span class="hljs-built_in">sleep</span>();
+  &#125;
+
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;</code></pre></div>
+
+<p>具体文件我放在了odom_tf_converter&#x2F;src&#x2F;tf_to_odom.cpp下面了</p>
+</li>
+<li><p>odom_combined-&gt;base_footprint</p>
+<p>同理robot_pose_ekf的原函数里已经编写了了tf发布的相关代码，通过设置odom_combined.launch文件中的接口可以自动完成tf的变换</p>
+<p><img src="https://i.loli.net/2020/08/04/QX2W5Etz9CO3e7m.png" srcset="/img/loading.gif" lazyload alt="image-20200804152949504"></p>
+<p><em>注意一定要将 rf2o 中的 tf 发布相关代码注释掉，否则构建出的 tf 树将出现问题，具体方法可以参考之前的博客内容</em></p>
+</li>
+</ul>
+<p>完成这两步内容后我们小车的tf树就没有问题了，接下来就是导航相关内容啦</p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/racecar%E6%99%BA%E8%83%BD%E8%BD%A6%E4%BB%BF%E7%9C%9F/" class="category-chain-item">racecar智能车仿真</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/ROS/">#ROS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>racecar仿真竞赛经验总结（五）- TF树</div>
+      <div>http://example.com/2020/08/04/racecar仿真竞赛经验总结（五）- TF树/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 4, 2020</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/05/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%85%AD%EF%BC%89-%20Navigation%E5%AF%BC%E8%88%AA%E5%8C%85/" title="racecar仿真竞赛经验总结（六）- Navigation导航包">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（六）- Navigation导航包</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/08/03/racecar%E4%BB%BF%E7%9C%9F%E7%AB%9E%E8%B5%9B%E7%BB%8F%E9%AA%8C%E6%80%BB%E7%BB%93%EF%BC%88%E5%9B%9B%EF%BC%89-%20AMCL%E4%B8%8E%E5%B0%8F%E8%BD%A6%E5%AE%9A%E4%BD%8D/" title="racecar仿真竞赛经验总结（四）- AMCL与小车定位">
+                        <span class="hidden-mobile">racecar仿真竞赛经验总结（四）- AMCL与小车定位</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

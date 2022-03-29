@@ -1,0 +1,864 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/hacker.png">
+  <link rel="icon" href="/img/hacker.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zachary Deng">
+  <meta name="keywords" content="Zack, blog, ROS, Zachary Deng, Zachary, Deng, 邓志豪">
+  
+    <meta name="description" content="Software Prototyping (I) - npm &amp; firebaseIntroduction： 本系列博客写作灵感来源于 Northwestern Universally ：COMP_SCI 397&#x2F;497 Rapid Software Protyping 这门课，也就是博主现在在上的课程。任课老师是Chris Riesbeck，教授在耶鲁做了15年研究过来的，人很好上课非常">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Software Prototyping (I) - npm &amp; firebase">
+<meta property="og:url" content="http://example.com/2021/10/01/Software%20Prototyping%20(I)%20-%20npm%20&%20firebase/index.html">
+<meta property="og:site_name" content="Zachary&#39;s Blog">
+<meta property="og:description" content="Software Prototyping (I) - npm &amp; firebaseIntroduction： 本系列博客写作灵感来源于 Northwestern Universally ：COMP_SCI 397&#x2F;497 Rapid Software Protyping 这门课，也就是博主现在在上的课程。任课老师是Chris Riesbeck，教授在耶鲁做了15年研究过来的，人很好上课非常">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-10-02T00:04:07.000Z">
+<meta property="article:modified_time" content="2021-11-20T05:48:56.000Z">
+<meta property="article:author" content="Zachary Deng">
+<meta property="article:tag" content="npm">
+<meta property="article:tag" content="firebase">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>Software Prototyping (I) - npm &amp; firebase - Zachary&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":60,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+        <img src=https://i.loli.net/2020/07/14/y2oaANRLjTYSpG1.gif width="50px">
+      <strong>Zachary Deng&#39;s Space</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+          
+              <li class="nav-item" id="search-btn">
+                  <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+                      &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+                  </a>
+              </li>
+              
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archive
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Category
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tag
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/about/">
+                    <i class="iconfont icon-user-fill"></i>
+                    About Me
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/resume/">
+                    <i class="iconfont icon-addrcard"></i>
+                    Resume
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/page3.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Software Prototyping (I) - npm &amp; firebase"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-10-01 19:04" pubdate>
+          October 1, 2021 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.5k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Software Prototyping (I) - npm &amp; firebase</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="Software-Prototyping-I-npm-amp-firebase"><a href="#Software-Prototyping-I-npm-amp-firebase" class="headerlink" title="Software Prototyping (I) - npm &amp; firebase"></a>Software Prototyping (I) - npm &amp; firebase</h1><p><strong>Introduction：</strong> 本系列博客写作灵感来源于 <code>Northwestern Universally ：COMP_SCI 397/497 Rapid Software Protyping</code> 这门课，也就是博主现在在上的课程。任课老师是<a target="_blank" rel="noopener" href="https://users.cs.northwestern.edu/~riesbeck/">Chris Riesbeck</a>，教授在耶鲁做了15年研究过来的，人很好上课非常有趣而且收获很大，在这里先感谢 Chris Riesbeck！另外教授上的 <code>CS 394 Agile Software Development</code> 也是一个系列的课程，推荐校友可以选他的课，workload会比其他课大但真的收获很多！</p>
+<hr>
+<p>本博客主要记录利用React以及firebase快速上手Web&#x2F;Android App开发的过程，主要对学习的东西做一个总结方便日后回顾。</p>
+<p>这里放一个第一周上课后做出的简单CS Class Scheduler选课APP链接：<a target="_blank" rel="noopener" href="https://zachary-cs-scheduler.web.app/">CS Class Scheduler</a></p>
+<p>github仓库链接：<a target="_blank" rel="noopener" href="https://github.com/zacdeng/cs497-scheduler">cs497-scheduler</a></p>
+<h2 id="npm简单介绍"><a href="#npm简单介绍" class="headerlink" title="npm简单介绍"></a>npm简单介绍</h2><p>在正式学习 React 技术栈之前，我们先来介绍一下之后经常要使用到的 <code>npm</code></p>
+<p><code>npm</code> 最初它只是被称为 Node Package Manager，用来作为 Node.js 的包管理器。但是随着其它构建工具(webpack、browserify)的发展，npm已经变成了 “the package manager for JavaScript”，它用来安装、管理和分享JavaScript包，同时会自动处理多个包之间的依赖</p>
+<p>现在的 <code>Node.js</code> 在安装的时候集成了 <code>npm</code> ，<code>npm</code> 的安装非常简单，不管你是用的是什么操作系统，我们只需要打开 Nodejs 官网，网站会自动匹配你的系统显示相应的安装包，点击最新版本的下载按钮，等待安装包下载完成。需要注意的是在安装内容当中，必须确保配置环境变量的选项是被勾选中的再进行下一步操作</p>
+<p>我们可以打开控制台，输入 <code>npm</code> 或 <code>node</code> 检验是否安装成功。附加 version 参数可以查看我们安装的 <code>npm</code> 及 <code>node</code> 的版本</p>
+<div class="code-wrapper"><pre><code class="hljs shell">node -v
+npm -v</code></pre></div>
+
+<h3 id="npm常用命令"><a href="#npm常用命令" class="headerlink" title="npm常用命令"></a>npm常用命令</h3><ul>
+<li><strong>查看命令帮助</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">npm help &lt;某命令&gt;</code></pre></div>
+
+<ul>
+<li>列出各命令</li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">npm -l</code></pre></div>
+
+<ul>
+<li><strong>查看安装信息</strong></li>
+</ul>
+<p>安装信息和它们的依赖</p>
+<div class="code-wrapper"><pre><code class="hljs shell">//全局安装信息
+npm ls -g
+
+//列出当前项目中的包
+npm ls</code></pre></div>
+
+<ul>
+<li><strong>卸载包</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">npm uninstall &lt;包名&gt;</code></pre></div>
+
+<ul>
+<li><strong>更新包</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">//更新当前项目中安装的某个包
+npm update &lt;包名&gt;
+
+//更新当前项目中安装的所有包
+npm update
+
+//更新全局安装的包
+npm update &lt;包名&gt; -g</code></pre></div>
+
+<ul>
+<li><strong>搜索包</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">npm search &lt;关键字&gt;</code></pre></div>
+
+<ul>
+<li><strong>列出npm的配置</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">npm config list -l</code></pre></div>
+
+<ul>
+<li><strong>列出bin目录</strong></li>
+</ul>
+<div class="code-wrapper"><pre><code class="hljs shell">npm bin</code></pre></div>
+
+<h3 id="使用-package-json"><a href="#使用-package-json" class="headerlink" title="使用 package.json"></a>使用 package.json</h3><p>当你的项目需要依赖多个包时，推荐使用 package.json。其优点为：</p>
+<ul>
+<li>它以文档的形式规定了项目所依赖的包</li>
+<li>可以确定每个包所使用的版本</li>
+<li>项目的构建可以重复，在多人协作时更加方便</li>
+</ul>
+<h3 id="创建package-json文件"><a href="#创建package-json文件" class="headerlink" title="创建package.json文件"></a>创建package.json文件</h3><ul>
+<li>手动创建</li>
+<li>或者 通过 <code>npm init</code> 命令生成遵守规范的 package.json文件</li>
+</ul>
+<p>文件中必须包含两个键值对： <code>name</code>  和 <code>version</code></p>
+<div class="code-wrapper"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;scheduler&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.1.0&quot;</span>
+<span class="hljs-punctuation">&#125;</span></code></pre></div>
+
+<h3 id="npm脚本"><a href="#npm脚本" class="headerlink" title="npm脚本"></a>npm脚本</h3><p>简单来说 npm 脚本就是指 npm 允许在<code>package.json</code>文件里面，使用<code>scripts</code>字段定义脚本命令。例如：</p>
+<div class="code-wrapper"><pre><code class="hljs json"><span class="hljs-punctuation">&#123;</span>
+  <span class="hljs-comment">// ...</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span>
+    <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;node build.js&quot;</span>
+  <span class="hljs-punctuation">&#125;</span>
+<span class="hljs-punctuation">&#125;</span></code></pre></div>
+
+<p>上面代码是<code>package.json</code>文件的一个片段，里面的<code>scripts</code>字段是一个对象。它的每一个属性，对应一段脚本。比如，<code>build</code>命令对应的脚本是<code>node build.js</code>。</p>
+<p>命令行下使用<code>npm run</code>命令，就可以执行这段脚本。</p>
+<div class="code-wrapper"><pre><code class="hljs shell">npm run build
+<span class="hljs-meta prompt_"># </span><span class="language-bash">等同于执行下面内容</span>
+node build.js</code></pre></div>
+
+<p><code>npm run lint</code>可以运行脚本中的 lint 命令。<code>npm run test</code>可以运行脚本中的 test 命令。</p>
+<p><code>npm run</code>命令会自动在环境变量<code>$PATH</code>添加<code>node_modules/.bin</code>目录，所以<code>scripts</code>字段里面调用命令时不用加上路径，这就避免了全局安装NPM模块。</p>
+<p><code>start</code>和<code>test</code>属于特殊命令，可以省略<code>run</code>：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">npm start 
+npm test</code></pre></div>
+
+<p>如果仅仅使用<code>npm run</code>会列出scripts属性下所有的命令：</p>
+<div class="code-wrapper"><pre><code class="hljs shell">npm run</code></pre></div>
+
+<p>具体内容可以参考大佬的帖子，总结的很详细：<a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2016/10/npm_scripts.html">npm脚本使用指南</a></p>
+<h2 id="Firebase简单介绍"><a href="#Firebase简单介绍" class="headerlink" title="Firebase简单介绍"></a>Firebase简单介绍</h2><p>简单来说，Firebase是构建Web，Android和IOS应用程序的后端平台。 它提供了实时数据库，不同的API，多种认证类型和托管平台。这个系列博客的web application就是通过firebase部署，这里对firebase这个平台做一个简单的介绍，具体操作和使用将在接下来详细介绍</p>
+<p>根据官方Firebase文档 -</p>
+<blockquote>
+<p>Firebase可以为应用程序的后台提供支持，包括数据存储，用户身份验证，静态托管等。专注于创造非凡的用户体验。我们会照顾其余的。使用我们的Android，iOS和JavaScript SDK创建跨平台的原生手机和网络应用程序。您也可以使用我们的服务器端库或REST API将Firebase连接到现有的后端。</p>
+</blockquote>
+<h3 id="Firebase功能"><a href="#Firebase功能" class="headerlink" title="Firebase功能"></a>Firebase功能</h3><ul>
+<li><strong>实时数据库</strong> - Firebase支持JSON数据，所有连接的用户在每次更改后都会收到实时更新。</li>
+<li><strong>身份验证</strong> - 您可以使用匿名，密码或不同的社交认证。</li>
+<li><strong>托管</strong> - 可以通过与Firebase服务器的安全连接部署应用程序。</li>
+</ul>
+<h3 id="Firebase的优点"><a href="#Firebase的优点" class="headerlink" title="Firebase的优点"></a>Firebase的优点</h3><ul>
+<li>它是简单和用户友好。不需要复杂的配置。</li>
+<li>数据是实时的，这意味着每次更改都会自动更新连接的客户端。</li>
+<li>Firebase提供简单的控制仪表板。</li>
+<li>有很多有用的服务可供选择。</li>
+</ul>
+<h3 id="Firebase限制"><a href="#Firebase限制" class="headerlink" title="Firebase限制"></a>Firebase限制</h3><ul>
+<li>Firebase免费计划限于50个连接和100mb的存储。</li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Software-Prototyping/" class="category-chain-item">Software Prototyping</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/npm/">#npm</a>
+      
+        <a href="/tags/firebase/">#firebase</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Software Prototyping (I) - npm &amp; firebase</div>
+      <div>http://example.com/2021/10/01/Software Prototyping (I) - npm &amp; firebase/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Zachary Deng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>October 1, 2021</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/11/01/Software%20Prototyping%20(II)%20-%20React%20&amp;%20Firebase%20start%20code/" title="Software Prototyping (II) - React &amp; Firebase start code">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Software Prototyping (II) - React &amp; Firebase start code</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/01/Software%20Prototyping%20(%E2%85%A2)%20-%20Get%20to%20know%20React/" title="Software Prototyping (Ⅲ) - Get to know React">
+                        <span class="hidden-mobile">Software Prototyping (Ⅲ) - Get to know React</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+    <div>
+        <word style=font-size:13px>
+            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
+            | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
+        </word>
+
+        <br>
+
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/UPEGCM1z2tgeWsI.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_pv"></span> |
+      </span>
+
+        <span style=font-size:13px>
+        <img src="https://i.loli.net/2020/07/19/T8hEs9tzj5acZpF.png" srcset="/img/loading.gif" lazyload width="20px"> <span id="busuanzi_value_site_uv"></span>
+      </span>
+
+        <br>
+
+        <span id="timeDate" style=font-size:13px>载入天数...</span>
+        <span id="times" style=font-size:13px>载入时分秒...</span>
+        <script>
+          var now = new Date();
+          function createtime(){
+            var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
+            now.setTime(now.getTime()+250);
+            days = (now - grt ) / 1000 / 60 / 60 / 24;
+            dnum = Math.floor(days);
+            hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
+            hnum = Math.floor(hours);
+            if(String(hnum).length ==1 ){
+              hnum = "0" + hnum;
+            }
+            minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+            mnum = Math.floor(minutes);
+            if(String(mnum).length ==1 ){
+              mnum = "0" + mnum;
+            }
+            seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+            snum = Math.round(seconds);
+            if(String(snum).length ==1 ){
+              snum = "0" + snum;
+            }
+            document.getElementById("timeDate").innerHTML = "本站安全运行&nbsp"+dnum+"&nbsp天";
+            document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
+          }
+          setInterval("createtime()",250);
+        </script>
+    </div>
+
+  
+</div>
+
+
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
