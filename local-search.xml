@@ -445,33 +445,6 @@
   
   
   <entry>
-    <title>Reinforcement Learning</title>
-    <link href="/2021/04/24/Reinforcement%20Learning-Introduction/"/>
-    <url>/2021/04/24/Reinforcement%20Learning-Introduction/</url>
-    
-    <content type="html"><![CDATA[<h1 id="Reinforcement-Learning-Introduction"><a href="#Reinforcement-Learning-Introduction" class="headerlink" title="Reinforcement Learning - Introduction"></a>Reinforcement Learning - Introduction</h1><p>毕设做的强化学习内容，准备有时间了整理一下整个流程，先占个坑</p>]]></content>
-    
-    
-    <categories>
-      
-      <category>Reinforcement Learning</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>强化学习</tag>
-      
-      <tag>Reinforcement Learning</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>git首次配置远程仓库</title>
     <link href="/2021/04/24/git%E9%A6%96%E6%AC%A1%E9%85%8D%E7%BD%AE%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/"/>
     <url>/2021/04/24/git%E9%A6%96%E6%AC%A1%E9%85%8D%E7%BD%AE%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93/</url>
@@ -506,7 +479,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
@@ -531,7 +504,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
@@ -556,7 +529,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
@@ -581,7 +554,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
@@ -606,7 +579,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
@@ -631,7 +604,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
@@ -656,7 +629,7 @@
     
     <categories>
       
-      <category>racecar智能车仿真</category>
+      <category>racecar simulation</category>
       
     </categories>
     
