@@ -623,7 +623,7 @@
 <!--      </div>-->
     <div>
         <word style=font-size:13px>
-            Copyright © 2020-2021 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">zacdeng </span></a>
+            Copyright © 2020-2024 <a href="http://zacdeng.github.io" target="_blank"><span style="color:rgb(28, 174, 240);">Zach Deng </span></a>
             | Powered by <a href="https://github.com/hexojs/hexo" target="_blank"><span style="color:rgb(28, 174, 240);">Hexo</span></a>
             | Theme <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank"><span style="color:rgb(28, 174, 240);">Fluid</span></a>
         </word>
@@ -649,7 +649,12 @@
             var grt= new Date("07/19/2020 00:00:00");//此处修改你的建站时间或者网站上线时间
             now.setTime(now.getTime()+250);
             days = (now - grt ) / 1000 / 60 / 60 / 24;
+            years = days / 365;
+            ynum = Math.floor(years);
             dnum = Math.floor(days);
+
+            dayCounter = Math.floor(days - (365 * ynum));
+
             hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum);
             hnum = Math.floor(hours);
             if(String(hnum).length ==1 ){
@@ -665,7 +670,7 @@
             if(String(snum).length ==1 ){
               snum = "0" + snum;
             }
-            document.getElementById("timeDate").innerHTML = "Safely running for &nbsp"+dnum+"&nbspdays";
+            document.getElementById("timeDate").innerHTML = "Safely running for&nbsp" + ynum + "&nbspyears " + dayCounter +"&nbspdays";
             document.getElementById("times").innerHTML = hnum + "&nbsphr&nbsp" + mnum + "&nbspmin&nbsp" + snum + "&nbspsec";
           }
           setInterval("createtime()",250);

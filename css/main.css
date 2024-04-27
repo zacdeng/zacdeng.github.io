@@ -1395,7 +1395,7 @@ figure.highlight td.code > pre {
   transition: border-color 0.2s ease-in-out;
 }
 .markdown-body pre {
-  font-size: 85% !important;
+  font-size: 78% !important;
 }
 .markdown-body pre .mermaid {
   text-align: center;
